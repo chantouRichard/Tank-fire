@@ -14,10 +14,22 @@
 #include<vector>
 
 
-int level1map[2][20]=
+int level1map[14][20]=
 {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+    {1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1},
+    {0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0}
 };
 
 level1::level1(QWidget *parent) :
@@ -27,7 +39,7 @@ level1::level1(QWidget *parent) :
     ui->setupUi(this);
     setFixedSize(1200,800);
     setWindowTitle("tankfire");
-//    this->setStyleSheet("background-color: black;");
+    this->setStyleSheet("background-color: black;");
 
     QPushButton * backbutton=new QPushButton("Back",this);
     backbutton->resize(200,100);
@@ -43,16 +55,22 @@ level1::level1(QWidget *parent) :
         emit this->back();
     });
 
+}
 
+
+void level1::paintEvent(QPaintEvent *event)
+{
     QPainter painter(this);
     QBrush brush(Qt::black);
 
     QPixmap pixWall1(":/1/Res/res/wall1.jpg");
     QPixmap pixWall2(":/1/Res/res/wall2.jpg");
     QPixmap water("");
-    for(int i=0;i<20;i++)
+
+
+    for(int i=0;i<14;i++)
     {
-        for(int j=0;j<14;j++)
+        for(int j=0;j<20;j++)
         {
             if(level1map[i][j]==1)painter.drawPixmap(j*60,i*60,60,60,pixWall1);
             else if(level1map[i][j]==2)painter.drawPixmap(j*60,i*60,60,60,pixWall2);
@@ -64,8 +82,6 @@ level1::level1(QWidget *parent) :
     QPixmap maindown;
     QPixmap mainleft;
     QPixmap mainright;
-
-
 
 }
 
