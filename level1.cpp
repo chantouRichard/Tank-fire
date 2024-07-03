@@ -12,7 +12,7 @@
 #include<queue>
 #include<QSound>
 #include<vector>
-
+#include"pass.h"
 
 int level1map[14][20]=
 {
@@ -36,15 +36,20 @@ level1::level1(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::level1)
 {
+
     ui->setupUi(this);
     setFixedSize(1200,800);
     setWindowTitle("tankfire");
-    this->setStyleSheet("background-color: black;");
-
+    //下一关按钮设置
+//    this->setStyleSheet("background-color: black;");
+    QPushButton * next=new QPushButton("Next level",this);
+    next->resize(150,50);
+    next->move(675,200);
+    //返回按钮
     QPushButton * backbutton=new QPushButton("Back",this);
     backbutton->resize(200,100);
     backbutton->move(1200,900);
-//    backbutton->move(this->width()/3-backbutton->width()/2,this->height()/2-backbutton->height()/2);
+    backbutton->move(this->width()/3-backbutton->width()/2,this->height()/2-backbutton->height()/2);
     QPushButton * nextlevel=new QPushButton("Next",this);
     nextlevel->resize(200,100);
     nextlevel->move(1200,1000);
@@ -54,9 +59,10 @@ level1::level1(QWidget *parent) :
     connect(backbutton,&QPushButton::clicked,[=](){
         emit this->back();
     });
-
+    connect(next,&QPushButton::clicked,[=](){
+        emit this->Win();
+    });
 }
-
 
 void level1::paintEvent(QPaintEvent *event)
 {
@@ -78,12 +84,26 @@ void level1::paintEvent(QPaintEvent *event)
 
         }
     }
-    QPixmap mainup;
-    QPixmap maindown;
-    QPixmap mainleft;
-    QPixmap mainright;
+
+    QPixmap mainup(":/1/Res/res/tank_up.jpg");
+    QPixmap maindown(":/1/Res/res/tank_down.jpg");
+    QPixmap mainleft(":/1/Res/res/tank_left.jpg");
+    QPixmap mainright(":/1/Res/res/tank_right.jpg");
 
 }
+//初始化玩家坦克
+void level1::initTank()
+{
+    int tankx=400;
+    int tanky=400;
+}
+//初始化敌军坦克
+void level1::initEnemyTank()
+{}
+
+//死亡效果
+void dead()
+{}
 
 level1::~level1()
 {
