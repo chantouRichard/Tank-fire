@@ -14,6 +14,7 @@ class level1 : public QWidget
 public:
     explicit level1(QWidget *parent = nullptr);
     ~level1();
+    void paintEvent(QPaintEvent *event) override;
 
 signals:
     void back();
