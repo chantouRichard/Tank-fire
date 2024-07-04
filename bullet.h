@@ -16,17 +16,22 @@ public:
     QTimer *bullettimer;
     void stoptimer();
     int type;
+    int MAP[25][25];
+    void Loadmap(int map[25][25]);
     QPixmap BULL;
     QLabel *BULA=new QLabel;
     void movebullet(QWidget*parent,int style,int x,int y);//发射子弹的移动
-    void checkmovebullet(int type);//检查子弹是否可以继续移动
+    bool checkmovebullet();//检查子弹是否可以继续移动
+    void updatemapsit();
     int bux;int buy;//记录子弹的位置
+    int mapbux;int mapbuy;
     int started; //记录是否开始计时
     void Disconnected();
     void moveup();
     void movedown();
     void moveleft();
     void moveright();
+
 signals:
 
 };
