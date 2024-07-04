@@ -1,6 +1,7 @@
-#include "level4.h"
+#include "level1.h"
+#include<QKeyEvent>
 
-int level4map[Mapx_size][Mapy_size] = {
+int level1map[Mapx_size][Mapy_size] = {
     {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
     {2,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
     {2,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
@@ -28,24 +29,33 @@ int level4map[Mapx_size][Mapy_size] = {
     {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
 };
 
-
-level4::level4(QWidget *parent) : Level(parent)
+level1::level1(QWidget *parent) : Level(parent)
 {
-    loadMap(level4map);
+    my_tank=new Tank(60,60,this);
+    loadMap(level1map);
+    initTank();
+
 }
 
-void level4::paintEvent(QPaintEvent *event) {
+void level1::keyPressEvent(QKeyEvent* event)
+{
+    my_tank->keyPressEvent(event);
+}
+
+void level1::paintEvent(QPaintEvent *event) {
     Level::paintEvent(event);
 }
 
-void level4::initTank() {
-    Level::initTank();
+void level1::initTank() {
+    my_tank->showtank(this);
+    my_tank->Loadmap(map);
+    my_tank->addbudget();
 }
 
-void level4::initEnemyTank() {
+void level1::initEnemyTank() {
     Level::initEnemyTank();
 }
 
-void level4::dead() {
+void level1::dead() {
     Level::dead();
 }

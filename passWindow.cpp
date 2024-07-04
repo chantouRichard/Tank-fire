@@ -84,132 +84,131 @@ PassWindow::PassWindow(QWidget *parent) : QWidget(parent)
     l4btn->setEnabled(false);
 
     //初始化connect
-//    setupLevel0Button(l1btn,Level1,l2btn);
-//    setupLevel1Button(l2btn,Level2,l3btn);
-//    setupLevel2Button(l3btn,Level3,l4btn);
-//    setupLevel3Button(l4btn,Level4);
-//    //第二关按钮触发
-//    if(pass_judge[0])
-//    {
-//        l2btn->setEnabled(true);
-//        colorChange(l2btn);
-//    }
-//    //第三关按钮触发
-//    if(pass_judge[1])
-//    {
-//        l3btn->setEnabled(true);
-//        colorChange(l3btn);
-//    }
-//    //第四关按钮触发
-//    if(pass_judge[2])
-//    {
-//        l4btn->setEnabled(true);
-//        colorChange(l4btn);
-//    }
+    setupLevel0Button(l1btn,Level1,l2btn);
+    setupLevel1Button(l2btn,Level2,l3btn);
+    setupLevel2Button(l3btn,Level3,l4btn);
+    setupLevel3Button(l4btn,Level4);
+    //第二关按钮触发
+    if(pass_judge[0])
+    {
+        l2btn->setEnabled(true);
+        colorChange(l2btn);
+    }
+    //第三关按钮触发
+    if(pass_judge[1])
+    {
+        l3btn->setEnabled(true);
+        colorChange(l3btn);
+    }
+    //第四关按钮触发
+    if(pass_judge[2])
+    {
+        l4btn->setEnabled(true);
+        colorChange(l4btn);
+    }
 
-    //按钮的重新配色
 
 }
 
-//void PassWindow::setupLevel0Button(QPushButton *button, level1 *level, QPushButton *nextButton)
-//{
-//    connect(button,&QPushButton::clicked,[=](){
-//        QTimer::singleShot(500,this,[=](){
-//            this->hide();
-//            level->show();
+void PassWindow::setupLevel0Button(QPushButton *button, level1 *level, QPushButton *nextButton)
+{
+    connect(button,&QPushButton::clicked,[=](){
+        QTimer::singleShot(500,this,[=](){
+            this->hide();
+            level->show();
 
-//            connect(level,&level1::Win,[=](){
-//                pass_judge[0]=true;
-//                colorChange(nextButton);
-//                nextButton->setEnabled(true);
-//                this->show();
-//                level->close();
-//                nextButton->clicked();
-//                this->hide();
-//            });
+            connect(level,&level1::Win,[=](){
+                pass_judge[0]=true;
+                colorChange(nextButton);
+                nextButton->setEnabled(true);
+                this->show();
+                level->close();
+                nextButton->clicked();
+                this->hide();
+            });
 
-//            connect(level,&level1::back,this,[=](){
-//                this->show();
-//                level->close();
-//            });
-//        });
+            connect(level,&level1::back,this,[=](){
+                this->show();
+                level->close();
+            });
+        });
 
-//    });
-//}
+    });
+}
 
-//void PassWindow::setupLevel1Button(QPushButton *button, level2 *level, QPushButton *nextButton)
-//{
-//    connect(button, &QPushButton::clicked, [=]() {
-//        QTimer::singleShot(500, this, [=]() {
-//            this->hide();
-//            level->show();
+void PassWindow::setupLevel1Button(QPushButton *button, level2 *level, QPushButton *nextButton)
+{
+    connect(button, &QPushButton::clicked, [=]() {
+        QTimer::singleShot(500, this, [=]() {
+            this->hide();
+            level->show();
 
-//            connect(level, &level2::Win, [=]() {
-//                pass_judge[1] = true;
-//                colorChange(nextButton);
-//                nextButton->setEnabled(true);
-//                this->show();
-//                level->close();
-//                nextButton->click();
-//                this->hide();
-//            });
+            connect(level, &level2::Win, [=]() {
+                pass_judge[1] = true;
+                colorChange(nextButton);
+                nextButton->setEnabled(true);
+                this->show();
+                level->close();
+                nextButton->click();
+                this->hide();
+            });
 
-//            connect(level, &level2::back, this, [=]() {
-//                this->show();
-//                level->hide();
-//            });
-//        });
-//    });
-//}
+            connect(level, &level2::back, this, [=]() {
+                this->show();
+                level->hide();
+            });
+        });
+    });
+}
 
-//void PassWindow::setupLevel2Button(QPushButton *button, level3 *level, QPushButton *nextButton)
-//{
-//    connect(button, &QPushButton::clicked, [=]() {
-//        QTimer::singleShot(500, this, [=]() {
-//            this->hide();
-//            level->show();
+void PassWindow::setupLevel2Button(QPushButton *button, level3 *level, QPushButton *nextButton)
+{
+    connect(button, &QPushButton::clicked, [=]() {
+        QTimer::singleShot(500, this, [=]() {
+            this->hide();
+            level->show();
 
-//            connect(level, &level3::Win, [=]() {
-//                pass_judge[2] = true;
-//                colorChange(nextButton);
-//                nextButton->setEnabled(true);
-//                this->show();
-//                level->close();
-//                nextButton->click();
-//                this->hide();
-//            });
+            connect(level, &level3::Win, [=]() {
+                pass_judge[2] = true;
+                colorChange(nextButton);
+                nextButton->setEnabled(true);
+                this->show();
+                level->close();
+                nextButton->click();
+                this->hide();
+            });
 
-//            connect(level, &level3::back, this, [=]() {
-//                this->show();
-//                level->hide();
-//            });
-//        });
-//    });
-//}
+            connect(level, &level3::back, this, [=]() {
+                this->show();
+                level->hide();
+            });
+        });
+    });
+}
 
-//void PassWindow::setupLevel3Button(QPushButton *button, level4 *level)
-//{
-//    connect(button,&QPushButton::clicked,[=](){
-//        QTimer::singleShot(500,this,[=](){
-//            this->hide();
-//            level->show();
+void PassWindow::setupLevel3Button(QPushButton *button, level4 *level)
+{
+    connect(button,&QPushButton::clicked,[=](){
+        QTimer::singleShot(500,this,[=](){
+            this->hide();
+            level->show();
 
-//            connect(level,&level4::Win,[=](){
-//                pass_judge[3]=true;
-//                colorChange(button);
-//                this->show();
-//                level->close();
+            connect(level,&level4::Win,[=](){
+                pass_judge[3]=true;
+                colorChange(button);
+                this->show();
+                level->close();
 
-//            });
+            });
 
-//            connect(level,&level4::back,this,[=](){
-//                this->show();
-//                level->close();
-//            });
-//        });
+            connect(level,&level4::back,this,[=](){
+                this->show();
+                level->close();
+            });
+        });
 
-//    });
-//}
+    });
+}
 
 void PassWindow::setColor(QPushButton * btn)
 {

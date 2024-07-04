@@ -1,6 +1,6 @@
-#include "level4.h"
+#include "level2.h"
 
-int level4map[Mapx_size][Mapy_size] = {
+int level2map[Mapx_size][Mapy_size] = {
     {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
     {2,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
     {2,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
@@ -28,24 +28,23 @@ int level4map[Mapx_size][Mapy_size] = {
     {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
 };
 
-
-level4::level4(QWidget *parent) : Level(parent)
+level2::level2(QWidget *parent) : Level(parent)
 {
-    loadMap(level4map);
+    loadMap(level2map);
 }
 
-void level4::paintEvent(QPaintEvent *event) {
+void level2::paintEvent(QPaintEvent *event) {
     Level::paintEvent(event);
 }
 
-void level4::initTank() {
+void level2::initTank() {
     Level::initTank();
 }
 
-void level4::initEnemyTank() {
+void level2::initEnemyTank() {
     Level::initEnemyTank();
 }
 
-void level4::dead() {
+void level2::dead() {
     Level::dead();
 }
