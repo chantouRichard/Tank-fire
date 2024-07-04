@@ -1,33 +1,27 @@
-#ifndef LEVEL4_H
-#define LEVEL4_H
+#ifndef level4_H
+#define level4_H
 
+#include "mainlevel.h"
 #include <QWidget>
 
 namespace Ui {
 class level4;
 }
 
-class level4 : public QWidget
-{
+class level4 : public mainlevel {
     Q_OBJECT
 
 public:
     explicit level4(QWidget *parent = nullptr);
     ~level4();
     void paintEvent(QPaintEvent *event) override;
-signals:
-    void Win();
-    void back();
+
 private:
     Ui::level4 *ui;
 
-    bool Pass=false;//判断是否通过该关卡
-    bool mainTankIsDead=false;
-    void initTank();
-    void initEnemyTank();
-    void dead();
-
-
+    void initTank() override;
+    void initEnemyTank() override;
+    void dead() override;
 };
 
-#endif // LEVEL4_H
+#endif // level4_H
