@@ -15,7 +15,7 @@ public:
     explicit Bullet(QWidget *parent = nullptr);
     QTimer *bullettimer;
     void stoptimer();
-    int type;
+    int type;    //标志子弹方向，1：上，2：下，3：左，4：右
     QPixmap BULL;
     QLabel *BULA=new QLabel;
     void movebullet(QWidget*parent,int style,int x,int y);//发射子弹的移动
