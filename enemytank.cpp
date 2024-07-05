@@ -6,11 +6,10 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QBrush>
-#include <global.h>
 #include <QWidget>
 #include<QTimer>
 #include<QLabel>
-#include"tank.h"
+
 
 EnemyTank::EnemyTank(int startX, int startY, QWidget* parent)
     : QWidget(parent), currentX(startX), currentY(startY), angle(90), isPaused(false), moveCounter(0) {
@@ -26,18 +25,13 @@ void EnemyTank::showTank(QWidget*pa)
     tank_img->move(currentX,currentY);
     //设置坦克图片始终在顶部
     tank_img->setWindowFlags(tank_img->windowFlags() | Qt::WindowStaysOnTopHint);
-
-//    setPixmap(QPixmap(":/2/Res/res2/up.jpg")); // 初始图像
     moveTimer = new QTimer(this);
-
-    connect(moveTimer, &QTimer::timeout, this, &EnemyTank::updatePosition);
     moveTimer->start(20); // 每20毫秒更新一次位置
-
+    connect(moveTimer, &QTimer::timeout, this, &EnemyTank::updatePosition);
+    
     pauseTimer = new QTimer(this);
     connect(pauseTimer, &QTimer::timeout, this, &EnemyTank::resumeMovement);
     srand(static_cast<unsigned>(time(0)));
-
-//    setPos(currentX * 3, currentY * 3); // 设置初始位置
 }
 
 void EnemyTank::updatePosition() {
@@ -48,44 +42,36 @@ void EnemyTank::updatePosition() {
         moveCounter = 0;
     } else {
         moveCounter++;
-//        qDebug()<<moveCounter;
+
     }
     updatemapsit();
     int stepSize = 5; // 设置步长
-//    qDebug()<<"nmd";
     switch (angle) {
         case 0: // Up
             if (!irremovable()) currentY -= stepSize;
             TANK.load(":/2/Res/res2/up.jpg");
             tank_img->setPixmap(TANK);
             tank_img->move(currentX,currentY);
-//            qDebug()<<"1";
             break;
         case 90: // Right
             if (!irremovable()) currentX += stepSize;
             TANK.load(":/2/Res/res2/right.jpg");
             tank_img->setPixmap(TANK);
             tank_img->move(currentX,currentY);
-//            qDebug()<<"2";
             break;
         case 180: // Down
             if (!irremovable()) currentY += stepSize;
             TANK.load(":/2/Res/res2/down.jpg");
             tank_img->setPixmap(TANK);
             tank_img->move(currentX,currentY);
-//            qDebug()<<"3";
             break;
         case 270: // Left
             if (!irremovable()) currentX -= stepSize;
             TANK.load(":/2/Res/res2/left.jpg");
             tank_img->setPixmap(TANK);
             tank_img->move(currentX,currentY);
-//            qDebug()<<"4";
             break;
     }
-//    qDebug()<<currentX<<' '<<currentY<<' '<<irremovable();
-
-//    setPos(currentX * 3, currentY * 3);
     if (rand() % 100 == 0) { // 5%的概率暂停
         isPaused = true;
         pauseTimer->start(500); // 暂停1秒
@@ -114,8 +100,6 @@ void EnemyTank::chooseNewDirection() {
             break;
     }
 }
-
-
 bool EnemyTank::irremovable() {
 
     if (currentX % 60 == 0 || currentY % 60 == 0) {
