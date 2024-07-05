@@ -29,7 +29,7 @@ public:
     int maptankx3;int maptanky3; //标记坦克的地图位置
     int maptankx4;int maptanky4; //标记坦克的地图位置
     QLabel *tank_img;
-    Bullet bugdet[18];
+    Bullet bugdet[5];
     QPixmap TANK;
     int MAP[Mapx_size][Mapy_size];
     Tank(int init_tank_x,int init_tank_y,QWidget *parent = nullptr);
@@ -41,6 +41,8 @@ public:
     void shoot(QKeyEvent *event);       //坦克的射击
     void addbudget();//填充子弹（将子弹设为当前地图）
     void updatemapsit();
+signals:
+    void move(int x,int y);
 private:
 
 };

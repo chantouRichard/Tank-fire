@@ -9,6 +9,7 @@ Tank::Tank(int init_tank_x,int init_tank_y,QWidget *parent): QWidget(parent)
     tankx=init_tank_x;tanky=init_tank_y;
     idx=-1;
     tank_img=new QLabel();
+    emit move(tankx,tanky);
 }
 
 void Tank::showtank(QWidget *pa)
@@ -17,6 +18,7 @@ void Tank::showtank(QWidget *pa)
     TANK.load(":/1/Res/res/p2tankD.gif");
     tank_img->setPixmap(TANK);
     tank_img->move(tankx,tanky);
+    tank_img->show();
     //设置坦克图片始终在顶部
     tank_img->setWindowFlags(tank_img->windowFlags() | Qt::WindowStaysOnTopHint);
 }
@@ -73,8 +75,9 @@ void Tank::shoot(QKeyEvent *event)
 {
     if(event->key()==KeyShoot){
         idx++;
-        if(idx<=bulletsnumber-1)
+        if(idx<=bulletsnumber-1){
             bugdet[idx].movebullet(this->parentWidget(),this->type,tankx,tanky);
+        }
         else
         {
             if(idx<2*bulletsnumber){
@@ -99,6 +102,7 @@ void Tank::MOVE(QKeyEvent *event,int x,int y){
         if(type==1&&!irremovable())
         {
             tank_img->move(x,y-10);
+            emit move(tankx,tanky);
         }
         else
         {
@@ -112,6 +116,7 @@ void Tank::MOVE(QKeyEvent *event,int x,int y){
         if(type==2&&!irremovable())
         {
             tank_img->move(x,y+10);
+            emit move(tankx,tanky);
         }
         else
         {
@@ -125,6 +130,7 @@ void Tank::MOVE(QKeyEvent *event,int x,int y){
         if(type==3&&!irremovable())
         {
             tank_img->move(x-10,y);
+            emit move(tankx,tanky);
         }
         else
         {
@@ -138,6 +144,7 @@ void Tank::MOVE(QKeyEvent *event,int x,int y){
         if(type==4&&!irremovable())
         {
             tank_img->move(x+10,y);
+            emit move(tankx,tanky);
         }
         else
         {
@@ -183,4 +190,5 @@ void Tank::updatemapsit(){
     maptanky3=(tanky+60)/60;
     maptankx4=maptankx1;
     maptanky4=maptanky3;
+
 }
