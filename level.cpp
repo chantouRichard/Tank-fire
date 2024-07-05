@@ -80,7 +80,16 @@ void Level::updatemapforboom(int mapx,int mapy){
 
     this->update();
     my_tank->Loadmap(map);
+    for(int i=0;i<enemy_num;i++)
+    {
+        enemys[i]->Loadmap(map);
+    }
     for(int i=0;i<bulletsnumber;i++){
         my_tank->bugdet[i].Loadmap(map);
+    }
+    for(int i=0;i<enemy_num;i++)
+    {
+        for(int j=0;j<bulletsnumber;j++)
+            enemys[i]->bullets[j].Loadmap(map);
     }
 }

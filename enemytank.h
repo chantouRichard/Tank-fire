@@ -7,54 +7,64 @@
 #include<QPaintEvent>
 #include<QWidget>
 #include"global.h"
-#include<QLabel>
 #include"tank.h"
+#include<QLabel>
+#include<QVector>
+#include<QQueue>
 #include "enemybullet.h"
-class EnemyTank : public QWidget {
+
+struct Box
+{
+    int x;int y;
+    Box* pre;
+    Box(int x,int y,Box* pre=nullptr);
+};
+
+class EnemyTank : public QWidget{
     Q_OBJECT
 
 public:
-    EnemyTank(int startX, int startY, QWidget* parent = nullptr);
-    QTimer* moveTimer;
-    QTimer* pauseTimer;
-    QTimer* shootTimer;
-    int idx;
-    int type;
+
+    QTimer* moveTimer;  //移动方向判断间隔
+    QTimer* pauseTimer; //敌人坦克暂停时间
+    QTimer* shootTimer; //发射子弹间隔
+    int idx;            //子弹序号
+    int type;           //和angle都标志方向
     int initEnemyMap[25][25];//定义敌方坦克的地图
     int currentX, currentY;
-
-    enemybullet budget[5];//记录敌方子弹夹
-
-    int maptankx1;int maptanky1; //标记坦克的地图位置
-    int maptankx2;int maptanky2; //标记坦克的地图位置
-    int maptankx3;int maptanky3; //标记坦克的地图位置
-    int maptankx4;int maptanky4; //标记坦克的地图位置
-
-    QLabel *tank_img=NULL;
-    QPixmap TANK;
-    //改变方向函数
-    void changeDirection(int angle);
+    int map_enemy_tankx1;int map_enemy_tanky1; //标记坦克的地图位置
+    int map_enemy_tankx2;int map_enemy_tanky2; //标记坦克的地图位置
+    int map_enemy_tankx3;int map_enemy_tanky3; //标记坦克的地图位置
+    int map_enemy_tankx4;int map_enemy_tanky4; //标记坦克的地图位置
+    int MAP[Mapx_size][Mapy_size];
     int angle;
     bool isPaused;
-    std::vector<std::vector<int>> grid;
+    enemybullet bullets[5];//记录敌方子弹夹
+    QLabel *enemy_tank_img=NULL;
+    QPixmap Enemy_Tank;
+    int moveCounter;
+    const int maxMoveSteps = 24; // 坦克在同一方向上移动的最大步数
+    Tank* playerTank;
+
+    EnemyTank(int startX, int startY, Tank* playerTank,QWidget* parent = nullptr);
+    //改变方向函数
+    void changeDirection(int angle);
     void setEnemyMap(int map[25][25]);
     void Loadmap(int map[25][25]);
+    //检查坦克是否可以移动
+    bool irremovable();
+    void chooseNewDirection();
+    void updatemapsit();
+    void chooseNewDirection_smarter();
+    void showTank(QWidget*pa);
+    void getDire_BFS(int sx,int sy,int ex,int ey,QVector<QVector<bool>>& visited);
     void addenemybullet();//敌方装弹
     void shoot();
     void startshoottime();
-    int MAP[Mapx_size][Mapy_size];
-
-    int moveCounter=0;
-    const int maxMoveSteps = 80; // 坦克在同一方向上移动的最大步数
-
-    bool irremovable();   //检查坦克是否可以移动
-
-    void chooseNewDirection();
-    void updatemapsit();
-    void showTank(QWidget*pa);
 private slots:
     void updatePosition();
     void resumeMovement();
+
 
 private:
 
