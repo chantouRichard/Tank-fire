@@ -1,8 +1,8 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 #include"tank.h"
-#include"enemytank.h"
 #include"global.h"
+#include"enemytank.h"
 #include <QWidget>
 #include<QPaintEvent>
 class Level : public QWidget
@@ -13,6 +13,7 @@ public:
 
     int map[Mapx_size][Mapy_size]; // 存储地图
     void loadMap(int newMap[Mapx_size][Mapy_size]); // 加载地图
+    virtual void updatemapforboom(int mapx,int mapy);
     virtual void initTank();
     virtual void initEnemyTank();
     virtual void dead();

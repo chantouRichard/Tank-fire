@@ -8,48 +8,58 @@
 #include<QWidget>
 #include"global.h"
 #include<QLabel>
-
-
-class EnemyTank : public QWidget, public QGraphicsPixmapItem {
+#include"tank.h"
+#include "enemybullet.h"
+class EnemyTank : public QWidget {
     Q_OBJECT
-    
+
 public:
-    
+    EnemyTank(int startX, int startY, QWidget* parent = nullptr);
     QTimer* moveTimer;
     QTimer* pauseTimer;
+    QTimer* shootTimer;
+    int idx;
+    int type;
     int initEnemyMap[25][25];//定义敌方坦克的地图
     int currentX, currentY;
+
+    enemybullet budget[5];//记录敌方子弹夹
+
     int maptankx1;int maptanky1; //标记坦克的地图位置
     int maptankx2;int maptanky2; //标记坦克的地图位置
     int maptankx3;int maptanky3; //标记坦克的地图位置
     int maptankx4;int maptanky4; //标记坦克的地图位置
-    int MAP[Mapx_size][Mapy_size];
-    int angle;
-    bool isPaused;
+
     QLabel *tank_img=NULL;
     QPixmap TANK;
-    int moveCounter;
-    const int maxMoveSteps = 80; // 坦克在同一方向上移动的最大步数
-    
-    
-    EnemyTank(int startX, int startY, QWidget* parent = nullptr);  
     //改变方向函数
     void changeDirection(int angle);
+    int angle;
+    bool isPaused;
+    std::vector<std::vector<int>> grid;
     void setEnemyMap(int map[25][25]);
     void Loadmap(int map[25][25]);
-    //检查坦克是否可以移动 
-    bool irremovable();     
+    void addenemybullet();//敌方装弹
+    void shoot();
+    void startshoottime();
+    int MAP[Mapx_size][Mapy_size];
+
+    int moveCounter=0;
+    const int maxMoveSteps = 80; // 坦克在同一方向上移动的最大步数
+
+    bool irremovable();   //检查坦克是否可以移动
+
     void chooseNewDirection();
     void updatemapsit();
     void showTank(QWidget*pa);
 private slots:
     void updatePosition();
     void resumeMovement();
-    
+
 private:
-    
-    
-    
+
+
+
 };
 
 #endif // ENEMYTANK_H

@@ -71,3 +71,16 @@ void Level::initEnemyTank() {
 void Level::dead() {
     // 通用的判断主坦克死亡的逻辑
 }
+
+void Level::updatemapforboom(int mapx,int mapy){
+    if(map[mapx][mapy]==1)
+    {
+        map[mapx][mapy]=0;
+    }
+
+    this->update();
+    my_tank->Loadmap(map);
+    for(int i=0;i<bulletsnumber;i++){
+        my_tank->bugdet[i].Loadmap(map);
+    }
+}
