@@ -1,4 +1,5 @@
 #include "bullet.h"
+#include"global.h"
 
 Bullet::Bullet(QWidget *parent) : QWidget(parent)
 {
@@ -20,14 +21,6 @@ Bullet::Bullet(QWidget *parent) : QWidget(parent)
     bigboomtimer=new QTimer(this);
     bullettimer->start(10);
     started=false;
-}
-
-void Bullet::Loadmap(int map[25][25]){
-    for(int i=0;i<25;i++){
-        for(int j=0;j<25;j++){
-            MAP[i][j]=map[i][j];
-        }
-    }
 }
 
 void Bullet::Disconnected(){
@@ -131,7 +124,7 @@ void Bullet::movebullet(QWidget* parent,int style,int x,int y){
 bool Bullet::checkmovebullet(){
 
     if(type==1){
-        if(MAP[mapbux][mapbuy]!=0)
+        if(MAP_Global[mapbux][mapbuy]!=0)
         {
             boommapsitx=mapbux;
             boommapsity=mapbuy;
@@ -139,7 +132,7 @@ bool Bullet::checkmovebullet(){
             emit boom(mapbux,mapbuy);
             return true;
         }
-        if(!MAP[mapbux][mapbuy-1]){
+        if(!MAP_Global[mapbux][mapbuy-1]){
             return false;
         }
         else{
@@ -155,7 +148,7 @@ bool Bullet::checkmovebullet(){
         }
     }
     if(type==2){
-        if(!MAP[mapbux][mapbuy+1]){
+        if(!MAP_Global[mapbux][mapbuy+1]){
             return false;
         }
         else{
@@ -171,14 +164,14 @@ bool Bullet::checkmovebullet(){
             }}
     }
     if(type==3){
-        if(MAP[mapbux][mapbuy]!=0){
+        if(MAP_Global[mapbux][mapbuy]!=0){
             boommapsitx=mapbux;
             boommapsity=mapbuy;
             bulletboom(bux-50,buy-50);
             emit boom(mapbux,mapbuy);
             return true;
         }
-        if( !MAP[mapbux-1][mapbuy])
+        if( !MAP_Global[mapbux-1][mapbuy])
             return false;
         else{
             if(bux>60*mapbux)
@@ -193,7 +186,7 @@ bool Bullet::checkmovebullet(){
         }
     }
     if(type==4){
-        if(! MAP[mapbux+1][mapbuy])
+        if(! MAP_Global[mapbux+1][mapbuy])
             return false;
         else{
             if(bux+5<60*(mapbux+1)){
@@ -214,6 +207,7 @@ void Bullet::updatemapsit(){
     mapbux=bux/60;
     mapbuy=buy/60;
 }
+
 bool Bullet::checkshootenemy(){
     if(bux>=enemyx&&bux<=(enemyx+60)&&buy>=enemyy&&bux<=(enemyx+60))
         return true;

@@ -1,6 +1,6 @@
 #ifndef LEVEL1_H
 #define LEVEL1_H
-
+#include"global.h"
 #include "level.h"
 #include<QKeyEvent>
 class level1 : public Level {

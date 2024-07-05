@@ -84,6 +84,7 @@ SettingWindow::SettingWindow(QWidget *parent) : QWidget(parent)
 void SettingWindow::handleVolumeChange(int value)
 {
     gameVolume = value;
+    player_background->setVolume(gameVolume);
     volumeLabel->setText(QString("音量: %1").arg(value));
     qDebug() << "value:" << value;
 }

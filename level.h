@@ -7,6 +7,7 @@
 #include"global.h"
 #include <QWidget>
 #include<QPaintEvent>
+
 class Level : public QWidget
 {
     Q_OBJECT
@@ -16,7 +17,6 @@ public:
     int* enemy_y_site;
     Tank* my_tank;
     EnemyTank** enemys;
-    int map[Mapx_size][Mapy_size]; // 存储地图
     void loadMap(int newMap[Mapx_size][Mapy_size]); // 加载地图
     virtual void initTank();
     virtual void initEnemyTank();

@@ -15,6 +15,7 @@ extern int enemy_speed;
 extern int bulletsnumber;
 const int Mapx_size=25;
 const int Mapy_size=25;
+extern int MAP_Global[Mapx_size][Mapy_size];
 extern QString filename;
 extern QMediaPlayer* player_background;
 extern QMediaPlayer* player_boom;

@@ -9,7 +9,6 @@ Tank::Tank(int init_tank_x,int init_tank_y,QWidget *parent): QWidget(parent)
     tankx=init_tank_x;tanky=init_tank_y;
     idx=-1;
     tank_img=new QLabel();
-    emit move(tankx,tanky);
 }
 
 void Tank::showtank(QWidget *pa)
@@ -32,42 +31,42 @@ bool Tank::irremovable()
         {
             if(tankx%60==0)
             {
-                return MAP[maptankx1][maptanky1-1]&&(tanky%60==0);
+                return MAP_Global[maptankx1][maptanky1-1]&&(tanky%60==0);
             }
             else
-                return MAP[maptankx1][maptanky1-1]||MAP[maptankx2][maptanky2-1];
+                return MAP_Global[maptankx1][maptanky1-1]||MAP_Global[maptankx2][maptanky2-1];
         }
         if(type==2){
             if(tankx%60==0)
             {
-                return MAP[maptankx1][maptanky1+1]&&(tanky%60==0);
+                return MAP_Global[maptankx1][maptanky1+1]&&(tanky%60==0);
             }
             else
-                return MAP[maptankx1][maptanky1+1]||MAP[maptankx2][maptanky2+1];
+                return MAP_Global[maptankx1][maptanky1+1]||MAP_Global[maptankx2][maptanky2+1];
         }
         if(type==3)
         {
             if(tanky%60==0)
             {
-                return MAP[maptankx1-1][maptanky1]&&(tankx%60==0);
+                return MAP_Global[maptankx1-1][maptanky1]&&(tankx%60==0);
             }
             else
             {
-                return MAP[maptankx1-1][maptanky1]||MAP[maptankx4-1][maptanky4];
+                return MAP_Global[maptankx1-1][maptanky1]||MAP_Global[maptankx4-1][maptanky4];
             }
 
         }
         if(type==4)
         {
             if(tanky%60==0)
-                return MAP[maptankx1+1][maptanky1]&&(tankx%60==0);
+                return MAP_Global[maptankx1+1][maptanky1]&&(tankx%60==0);
             else
-                return MAP[maptankx1+1][maptanky1]||MAP[maptankx4+1][maptanky4];
+                return MAP_Global[maptankx1+1][maptanky1]||MAP_Global[maptankx4+1][maptanky4];
         }
     }
     else
     {
-        return !((!MAP[maptankx1][maptanky1])&&(!MAP[maptankx2][maptanky2])&&(!MAP[maptankx3][maptanky3])&&(!MAP[maptankx4][maptanky4]));
+        return !((!MAP_Global[maptankx1][maptanky1])&&(!MAP_Global[maptankx2][maptanky2])&&(!MAP_Global[maptankx3][maptanky3])&&(!MAP_Global[maptankx4][maptanky4]));
     }
 }
 //坦克的射击
@@ -75,9 +74,8 @@ void Tank::shoot(QKeyEvent *event)
 {
     if(event->key()==KeyShoot){
         idx++;
-        if(idx<=bulletsnumber-1){
+        if(idx<=bulletsnumber-1)
             bugdet[idx].movebullet(this->parentWidget(),this->type,tankx,tanky);
-        }
         else
         {
             if(idx<2*bulletsnumber){
@@ -96,61 +94,44 @@ void Tank::shoot(QKeyEvent *event)
 }
 
 void Tank::MOVE(QKeyEvent *event,int x,int y){
-
     if(event->key()==KeyUp)
     {
-        if(type==1&&!irremovable())
+        type=1;
+        TANK.load(":/1/Res/res/p2tankU.gif");
+        tank_img->setPixmap(TANK);
+        if(!irremovable())
         {
             tank_img->move(x,y-10);
-            emit move(tankx,tanky);
-        }
-        else
-        {
-            type=1;
-            TANK.load(":/1/Res/res/p2tankU.gif");
-            tank_img->setPixmap(TANK);
         }
     }
     if(event->key()==KeyDown)
     {
+        type=2;
+        TANK.load(":/1/Res/res/p2tankD.gif");
+        tank_img->setPixmap(TANK);
         if(type==2&&!irremovable())
         {
             tank_img->move(x,y+10);
-            emit move(tankx,tanky);
-        }
-        else
-        {
-            type=2;
-            TANK.load(":/1/Res/res/p2tankD.gif");
-            tank_img->setPixmap(TANK);
         }
     }
     if(event->key()==KeyLeft)
     {
+        type=3;
+        TANK.load(":/1/Res/res/p2tankL.gif");
+        tank_img->setPixmap(TANK);
         if(type==3&&!irremovable())
         {
             tank_img->move(x-10,y);
-            emit move(tankx,tanky);
-        }
-        else
-        {
-            type=3;
-            TANK.load(":/1/Res/res/p2tankL.gif");
-            tank_img->setPixmap(TANK);
         }
     }
     if(event->key()==KeyRight)
     {
+        type=4;
+        TANK.load(":/1/Res/res/p2tankR.gif");
+        tank_img->setPixmap(TANK);
         if(type==4&&!irremovable())
         {
             tank_img->move(x+10,y);
-            emit move(tankx,tanky);
-        }
-        else
-        {
-            type=4;
-            TANK.load(":/1/Res/res/p2tankR.gif");
-            tank_img->setPixmap(TANK);
         }
     }
 }
@@ -166,21 +147,6 @@ void Tank::keyPressEvent(QKeyEvent *event) {
     shoot(event);
 }
 
-void Tank::Loadmap(int map[Mapx_size][Mapy_size]){
-    for(int i=0;i<Mapx_size;i++){
-        for(int j=0;j<Mapy_size;j++){
-            MAP[i][j]=map[i][j];
-        }
-    }
-}
-
-void Tank::addbudget(){
-    for(int i=0;i<bulletsnumber;i++)
-    {
-        bugdet[i].Loadmap(MAP);
-    }
-}
-
 void Tank::updatemapsit(){
     maptankx1=tankx/60;
     maptanky1=tanky/60;
@@ -190,5 +156,4 @@ void Tank::updatemapsit(){
     maptanky3=(tanky+60)/60;
     maptankx4=maptankx1;
     maptanky4=maptanky3;
-
 }

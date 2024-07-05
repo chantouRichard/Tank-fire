@@ -21,9 +21,9 @@ Box::Box(int x,int y,Box* pre)
 int dx[4]={1,0,-1,0};
 int dy[4]={0,1,0,-1};
 
-EnemyTank::EnemyTank(int startX, int startY, Tank* my_tank,QWidget* parent)
-    : QWidget(parent), currentX(startX), currentY(startY), angle(90), isPaused(false), moveCounter(0) ,playerTank(my_tank),idx(-1) {
-
+EnemyTank::EnemyTank(int startX, int startY, Tank*& my_tank,QWidget* parent)
+    : QWidget(parent), currentX(startX), currentY(startY), angle(90), isPaused(false), moveCounter(0) ,playerTank(my_tank) {
+    idx=-1;
     enemy_tank_img=new QLabel();
 }
 
@@ -86,6 +86,7 @@ void EnemyTank::updatePosition() {
         isPaused = true;
         pauseTimer->start(500); // 暂停1秒
     }
+    updata_enemy_site();
 }
 
 void EnemyTank::resumeMovement() {
@@ -145,7 +146,7 @@ void EnemyTank::getDire_BFS(int sx, int sy, int ex, int ey, QVector<QVector<bool
             tempx = curx + dx[i];
             tempy = cury + dy[i];
 
-            if (tempx >= 0 && tempx < Mapx_size && tempy >= 0 && tempy < Mapy_size && MAP[tempx][tempy] == 0 && !visited[tempx][tempy]) {
+            if (tempx >= 0 && tempx < Mapx_size && tempy >= 0 && tempy < Mapy_size && MAP_Global[tempx][tempy] == 0 && !visited[tempx][tempy]) {
                 Box* addbox = new Box(tempx, tempy, box);
                 qu.push_back(addbox);
                 record.push_back(addbox);
@@ -226,42 +227,34 @@ bool EnemyTank::irremovable() {
     if (currentX % 60 == 0 || currentY % 60 == 0) {
         if (angle == 0) {
             if (currentX % 60 == 0) {
-                return MAP[map_enemy_tankx1][map_enemy_tanky1 - 1] && (currentY % 60 == 0);
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 - 1] && (currentY % 60 == 0);
             } else {
-                return MAP[map_enemy_tankx1][map_enemy_tanky1 - 1] || MAP[map_enemy_tankx2][map_enemy_tanky2 - 1];
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 - 1] || MAP_Global[map_enemy_tankx2][map_enemy_tanky2 - 1];
             }
         }
         if (angle == 180) {
             if (currentX % 60 == 0) {
-                return MAP[map_enemy_tankx1][map_enemy_tanky1 + 1] && (currentY % 60 == 0);
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 + 1] && (currentY % 60 == 0);
             } else {
-                return MAP[map_enemy_tankx1][map_enemy_tanky1 + 1] || MAP[map_enemy_tankx2][map_enemy_tanky2 + 1];
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 + 1] || MAP_Global[map_enemy_tankx2][map_enemy_tanky2 + 1];
             }
         }
         if (angle == 270) {
             if (currentY % 60 == 0) {
-                return MAP[map_enemy_tankx1 - 1][map_enemy_tanky1] && (currentX % 60 == 0);
+                return MAP_Global[map_enemy_tankx1 - 1][map_enemy_tanky1] && (currentX % 60 == 0);
             } else {
-                return MAP[map_enemy_tankx1 - 1][map_enemy_tanky1] || MAP[map_enemy_tankx4 - 1][map_enemy_tanky4];
+                return MAP_Global[map_enemy_tankx1 - 1][map_enemy_tanky1] || MAP_Global[map_enemy_tankx4 - 1][map_enemy_tanky4];
             }
         }
         if (angle == 90) {
             if (currentY % 60 == 0) {
-                return MAP[map_enemy_tankx1 + 1][map_enemy_tanky1] && (currentX % 60 == 0);
+                return MAP_Global[map_enemy_tankx1 + 1][map_enemy_tanky1] && (currentX % 60 == 0);
             } else {
-                return MAP[map_enemy_tankx1 + 1][map_enemy_tanky1] || MAP[map_enemy_tankx4 + 1][map_enemy_tanky4];
+                return MAP_Global[map_enemy_tankx1 + 1][map_enemy_tanky1] || MAP_Global[map_enemy_tankx4 + 1][map_enemy_tanky4];
             }
         }
     }
-    return !((!MAP[map_enemy_tankx1][map_enemy_tanky1]) && (!MAP[map_enemy_tankx2][map_enemy_tanky2]) && (!MAP[map_enemy_tankx3][map_enemy_tanky3]) && (!MAP[map_enemy_tankx4][map_enemy_tanky4]));
-}
-
-void EnemyTank::Loadmap(int map[Mapx_size][Mapy_size]) {
-    for (int i = 0; i < Mapx_size; i++) {
-        for (int j = 0; j < Mapy_size; j++) {
-            MAP[i][j] = map[i][j];
-        }
-    }
+    return !((!MAP_Global[map_enemy_tankx1][map_enemy_tanky1]) && (!MAP_Global[map_enemy_tankx2][map_enemy_tanky2]) && (!MAP_Global[map_enemy_tankx3][map_enemy_tanky3]) && (!MAP_Global[map_enemy_tankx4][map_enemy_tanky4]));
 }
 
 void EnemyTank::updatemapsit(){
@@ -275,12 +268,6 @@ void EnemyTank::updatemapsit(){
     map_enemy_tanky4=map_enemy_tanky3;
 }
 
-void EnemyTank::addenemybullet(){
-    for(int i=0;i<bulletsnumber;i++)
-    {
-        bullets[i].Loadmap(initEnemyMap);
-    }
-    }//敌方装弹
 void EnemyTank::shoot(){
     if(angle==0)
         type=1;
@@ -309,8 +296,15 @@ void EnemyTank::shoot(){
 
     }
 }
+
 void  EnemyTank::startshoottime(){
     shootTimer = new QTimer(this);
     shootTimer->start(1000);
     connect(shootTimer,&QTimer::timeout,this,&EnemyTank::shoot);
+}
+
+void EnemyTank::updata_enemy_site()
+{
+    playerTank->enemy_tank_x=currentX;
+    playerTank->enemy_tank_y=currentY;
 }

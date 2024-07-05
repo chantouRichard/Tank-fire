@@ -26,7 +26,6 @@ public:
     bool started;    //记录是否开始计时
 
     QTimer *bullettimer;
-    int MAP[25][25];
     QPixmap BULL;
     QLabel *BULA;
     QPixmap Boom;
@@ -37,7 +36,6 @@ public:
     QTimer *bigboomtimer;
 
     void stoptimer();
-    void Loadmap(int map[25][25]);
     void movebullet(QWidget* parent,int style,int x,int y);//发射子弹的移动
     bool checkmovebullet();//检查子弹是否可以继续移动
     void updatemapsit();

@@ -58,8 +58,6 @@ void level1::paintEvent(QPaintEvent *event) {
 void level1::initTank() {
     my_tank=new Tank(60,60,this);
     my_tank->showtank(this);
-    my_tank->Loadmap(map);
-    my_tank->addbudget();
     for(int i=0;i<bulletsnumber;i++)
     {
         Bullet* it=&my_tank->bugdet[i];
@@ -85,7 +83,6 @@ void level1::initEnemyTank() {
     for(int i=0;i<enemy_num;i++)
     {
         enemys[i]=new EnemyTank(enemy_x_site[i],enemy_y_site[i],my_tank,this);
-        enemys[i]->Loadmap(map);
         enemys[i]->showTank(this);
         for(int j=0;j<bulletsnumber;j++)
         {
