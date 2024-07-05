@@ -32,9 +32,13 @@ int level1map[Mapx_size][Mapy_size] = {
 level1::level1(QWidget *parent) : Level(parent)
 {
     my_tank=new Tank(60,60,this);
-    loadMap(level1map);
-    initTank();
 
+    loadMap(level1map);
+    enemy1=new EnemyTank(120,120,this);
+    enemy2=new EnemyTank(240,120,this);
+    enemy3=new EnemyTank(360,120,this);
+    initTank();
+    initEnemyTank();
 }
 
 void level1::keyPressEvent(QKeyEvent* event)
@@ -52,8 +56,17 @@ void level1::initTank() {
     my_tank->addbudget();
 }
 
+
+
 void level1::initEnemyTank() {
-    Level::initEnemyTank();
+    enemy1->Loadmap(level1map);
+    enemy1->showTank(this);
+
+    enemy2->Loadmap(level1map);
+    enemy2->showTank(this);
+
+    enemy3->Loadmap(level1map);
+    enemy3->showTank(this);
 }
 
 void level1::dead() {
