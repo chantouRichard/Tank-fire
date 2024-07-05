@@ -64,6 +64,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         "}"
     );
 
+    //背景音乐
+    player_background->setMedia(QUrl("qrc:/5/Res/music/background.wav"));
+    //    playlist->addMedia(QUrl("qrc:/5/Res/music/background.wav"));
+    //    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+    player_background->setVolume(gameVolume);
+    player_background->play();
+
+    connect(player_background,&QMediaPlayer::stateChanged,player_background,&QMediaPlayer::play);
+
     pass_window=new PassWindow();
     setting_window=new SettingWindow();
     login_window=new LoginWindow();
