@@ -1,6 +1,7 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 #include"tank.h"
+#include"enemytank.h"
 #include"global.h"
 #include <QWidget>
 #include<QPaintEvent>
