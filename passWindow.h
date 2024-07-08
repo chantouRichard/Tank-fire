@@ -20,6 +20,11 @@ public:
 
     explicit pass(QWidget *parent = nullptr);
     ~pass();
+    //关卡星星存储
+    int level1Star=0;
+    int level2Star=0;
+    int level3Star=0;
+    int level4Star=0;
 
     //布尔数组
     bool pass_judge[4]={false,false,false,false};
