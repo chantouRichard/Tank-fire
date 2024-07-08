@@ -52,8 +52,11 @@ public:
     void move_down();
     void move_left();
     void move_right();
+
+    void check_get_prop();
 signals:
     void my_tank_shoot();
     void my_tank_move(int x,int y);
+    void get_prop(int id);
 };
 #endif // WIDGET_H

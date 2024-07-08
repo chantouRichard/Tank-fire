@@ -130,7 +130,7 @@ bool Bullet::checkmovebullet(){
         return true;
     }
     if(type==1){
-        if(MAP_Global[mapbux][mapbuy]!=0)
+        if(MAP_Global[mapbux][mapbuy]!=0&&MAP_Global[mapbux][mapbuy]!=3&&MAP_Global[mapbux][mapbuy]!=4&&MAP_Global[mapbux][mapbuy]<=10)
         {
             boommapsitx=mapbux;
             boommapsity=mapbuy;
@@ -138,7 +138,7 @@ bool Bullet::checkmovebullet(){
             emit boom(mapbux,mapbuy);
             return true;
         }
-        if(!MAP_Global[mapbux][mapbuy-1]){
+        if(MAP_Global[mapbux][mapbuy-1]==0||MAP_Global[mapbux][mapbuy-1]==3||MAP_Global[mapbux][mapbuy-1]==4||MAP_Global[mapbux][mapbuy-1]>10){
             return false;
         }
         else{
@@ -154,7 +154,7 @@ bool Bullet::checkmovebullet(){
         }
     }
     if(type==2){
-        if(!MAP_Global[mapbux][mapbuy+1]){
+        if(MAP_Global[mapbux][mapbuy+1]==0||MAP_Global[mapbux][mapbuy+1]==3||MAP_Global[mapbux][mapbuy+1]==4||MAP_Global[mapbux][mapbuy+1]>10){
             return false;
         }
         else{
@@ -170,14 +170,14 @@ bool Bullet::checkmovebullet(){
             }}
     }
     if(type==3){
-        if(MAP_Global[mapbux][mapbuy]!=0){
+        if(MAP_Global[mapbux][mapbuy]!=0&&MAP_Global[mapbux][mapbuy]!=3&&MAP_Global[mapbux][mapbuy]!=4&&MAP_Global[mapbux][mapbuy]<=10){
             boommapsitx=mapbux;
             boommapsity=mapbuy;
             bulletboom(bux-50,buy-50);
             emit boom(mapbux,mapbuy);
             return true;
         }
-        if( !MAP_Global[mapbux-1][mapbuy])
+        if( MAP_Global[mapbux-1][mapbuy]==0||MAP_Global[mapbux-1][mapbuy]==3||MAP_Global[mapbux-1][mapbuy]==4||MAP_Global[mapbux-1][mapbuy]>10)
             return false;
         else{
             if(bux>60*mapbux)
@@ -192,7 +192,7 @@ bool Bullet::checkmovebullet(){
         }
     }
     if(type==4){
-        if(! MAP_Global[mapbux+1][mapbuy])
+        if(MAP_Global[mapbux+1][mapbuy]==0||MAP_Global[mapbux+1][mapbuy]==3||MAP_Global[mapbux+1][mapbuy]==4||MAP_Global[mapbux+1][mapbuy]>10)
             return false;
         else{
             if(bux+5<60*(mapbux+1)){

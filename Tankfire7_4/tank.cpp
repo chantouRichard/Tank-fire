@@ -33,53 +33,92 @@ bool Tank::irremovable()
     tankx=tank_img->pos().x();
     tanky=tank_img->pos().y();
     updatemapsit();
+    bool check1=1;bool check2=1;bool check3=1;bool check4=1;bool check5=1,check6=1,check7=1,check8=1,check9=1,check10=1,check11=1,check12=1;
+    if(MAP_Global[maptankx1][maptanky1-1]==4||MAP_Global[maptankx1][maptanky1-1]==0){
+        check1=0;
+    }
+    if(MAP_Global[maptankx2][maptanky2-1]==4||MAP_Global[maptankx2][maptanky2-1]==0){
+        check2=0;
+    }
+    if(MAP_Global[maptankx1][maptanky1+1]==4||MAP_Global[maptankx1][maptanky1+1]==0){
+        check3=0;
+    }
+    if(MAP_Global[maptankx2][maptanky2+1]==4||MAP_Global[maptankx2][maptanky2+1]==0){
+        check4=0;
+    }
+    if(MAP_Global[maptankx1-1][maptanky1]==4||MAP_Global[maptankx1-1][maptanky1]==0){
+        check5=0;
+    }
+    if(MAP_Global[maptankx4-1][maptanky4]==4||MAP_Global[maptankx4-1][maptanky4]==0){
+        check6=0;
+    }
+    if(MAP_Global[maptankx1+1][maptanky1]==4||MAP_Global[maptankx1+1][maptanky1]==0){
+        check7=0;
+    }
+    if(MAP_Global[maptankx4+1][maptanky4]==4||MAP_Global[maptankx4+1][maptanky4]==0){
+        check8=0;
+    }
+    if(MAP_Global[maptankx1][maptanky1]==4||MAP_Global[maptankx1][maptanky1]==0){
+        check9=0;
+    }
+    if(MAP_Global[maptankx2][maptanky2]==4||MAP_Global[maptankx2][maptanky2]==0){
+        check10=0;
+    }
+    if(MAP_Global[maptankx3][maptanky3]==4||MAP_Global[maptankx3][maptanky3]==0){
+        check11=0;
+    }
+    if(MAP_Global[maptankx4][maptanky4]==4||MAP_Global[maptankx4][maptanky4]==0){
+        check12=0;
+    }
     if(tankx%60==0||tanky%60==0)
     {
         if(type==1)
         {
             if(tankx%60==0)
             {
-                return MAP_Global[maptankx1][maptanky1-1]&&(tanky%60==0);
+                return check1&&(tanky%60==0);
             }
             else
-                return MAP_Global[maptankx1][maptanky1-1]||MAP_Global[maptankx2][maptanky2-1];
+                return (check1||check2);
         }
         if(type==2){
             if(tankx%60==0)
             {
-                return MAP_Global[maptankx1][maptanky1+1]&&(tanky%60==0);
+                return check3&&(tanky%60==0);
             }
             else
-                return MAP_Global[maptankx1][maptanky1+1]||MAP_Global[maptankx2][maptanky2+1];
+                return check3||check4;
         }
         if(type==3)
         {
             if(tanky%60==0)
             {
-                return MAP_Global[maptankx1-1][maptanky1]&&(tankx%60==0);
+                return check5&&(tankx%60==0);
             }
             else
             {
-                return MAP_Global[maptankx1-1][maptanky1]||MAP_Global[maptankx4-1][maptanky4];
+                return check5||check6;
             }
 
         }
         if(type==4)
         {
             if(tanky%60==0)
-                return MAP_Global[maptankx1+1][maptanky1]&&(tankx%60==0);
+                return check7&&(tankx%60==0);
             else
-                return MAP_Global[maptankx1+1][maptanky1]||MAP_Global[maptankx4+1][maptanky4];
+                return check7||check8;
         }
     }
     else
     {
-        return !((!MAP_Global[maptankx1][maptanky1])&&(!MAP_Global[maptankx2][maptanky2])&&(!MAP_Global[maptankx3][maptanky3])&&(!MAP_Global[maptankx4][maptanky4]));
+        return !((!check9)&&(!check10)&&(!check11)&&(!check12));
     }
 }
 //坦克的射击
 void Tank::shoot(QKeyEvent *event)
 {
+    if(event->isAutoRepeat())
+        return;
     if(event->key()==KeyShoot&&my_tank_live){
         emit my_tank_shoot();
         idx++;
@@ -190,7 +229,6 @@ if(event->isAutoRepeat())
         startedmle=0;
     }
     if(event->key()==KeyRight){
-        qDebug()<<"stop";
         disconnect(movetimer,&QTimer::timeout,this,&Tank::move_right);
         startedmri=0;
     }
@@ -208,32 +246,55 @@ void Tank::updatemapsit(){
 
 void Tank::Deletebullets(){
     for(int i=0;i<bulletsnumber;i++){
-        bugdet[i].hide();
+        bugdet[i].BULA->hide();
         bugdet[i].BOOM->hide();
         bugdet[i].bigBOOM->hide();
     }
 }
 void Tank::move_up(){
     if(irremovable()) return;
+    check_get_prop();
     type=1;
     tank_img->move(tankx,tanky-10);
     emit my_tank_move(tankx,tanky);
 }
 void Tank::move_down(){
     if(irremovable()) return;
+    check_get_prop();
     type=2;
     tank_img->move(tankx,tanky+10);
     emit my_tank_move(tankx,tanky);
 }
 void Tank::move_left(){
     if(irremovable()) return;
+    check_get_prop();
     type=3;
     tank_img->move(tankx-10,tanky);
     emit my_tank_move(tankx,tanky);
 }
 void Tank::move_right(){
     if(irremovable()) return;
+    check_get_prop();
     type=4;
     tank_img->move(tankx+10,tanky);
     emit my_tank_move(tankx,tanky);
+}
+
+void Tank::check_get_prop(){
+    if(MAP_Global[maptankx1][maptanky1]==20||MAP_Global[maptankx1][maptanky1]==30||MAP_Global[maptankx1][maptanky1]==40||MAP_Global[maptankx1][maptanky1]==50){
+        emit get_prop(MAP_Global[maptankx1][maptanky1]);
+        MAP_Global[maptankx1][maptanky1]=0;
+    }
+    if((MAP_Global[maptankx2][maptanky2]==20||MAP_Global[maptankx2][maptanky2]==30||MAP_Global[maptankx2][maptanky2]==40||MAP_Global[maptankx2][maptanky2]==50)&&(tankx%60!=0)){
+        emit get_prop(MAP_Global[maptankx2][maptanky2]);
+        MAP_Global[maptankx2][maptanky2]=0;
+    }
+    if((MAP_Global[maptankx3][maptanky3]==20||MAP_Global[maptankx3][maptanky3]==30||MAP_Global[maptankx3][maptanky3]==40||MAP_Global[maptankx3][maptanky3]==50)&&(tankx%60!=0)&&(tanky%60!=0)){
+        emit get_prop(MAP_Global[maptankx3][maptanky3]);
+        MAP_Global[maptankx3][maptanky3]=0;
+    }
+    if((MAP_Global[maptankx4][maptanky4]==20||MAP_Global[maptankx4][maptanky4]==30||MAP_Global[maptankx4][maptanky4]==40||MAP_Global[maptankx4][maptanky4]==50)&&(tanky%60!=0)){
+        emit get_prop(MAP_Global[maptankx4][maptanky4]);
+        MAP_Global[maptankx4][maptanky4]=0;
+    }
 }

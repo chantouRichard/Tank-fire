@@ -41,9 +41,10 @@ public:
     QLabel *enemy_tank_img=NULL;
     QPixmap Enemy_Tank;
     int moveCounter;
-    const int maxMoveSteps = 24; // 坦克在同一方向上移动的最大步数
+    int enemytank_style;
+    int enemy_HP;
+    const int maxMoveSteps = 12; // 坦克在同一方向上移动的最大步数
     Tank* playerTank;
-
     EnemyTank(int startX, int startY, Tank*& playerTank,QWidget* parent = nullptr);
     //改变方向函数
     void changeDirection(int angle);
