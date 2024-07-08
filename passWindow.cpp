@@ -29,6 +29,11 @@ pass::pass(QWidget *parent) :
 //    QPalette palette;
 //    palette.setBrush(QPalette::Background, QBrush(QPixmap(":/1/Res/res/gameover.jpg").scaled(this->size())));
 //    this->setPalette(palette);
+    //每个关卡的星星存储
+    level1Star=0;
+    level2Star=0;
+    level3Star=0;
+    level4Star=0;
 
     level1* Level1 = new level1;
     level2* Level2 = new level2;
@@ -112,7 +117,8 @@ void pass::setupLevel0Button(QPushButton *button, level1 *level, QPushButton *ne
     connect(button, &QPushButton::clicked, [=]() {
         QTimer::singleShot(500, this, [=]() {
             this->hide();
-
+            level->deletePassPage();
+            level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
             level->show();
@@ -128,11 +134,16 @@ void pass::setupLevel0Button(QPushButton *button, level1 *level, QPushButton *ne
             });
 
             connect(level, &level1::back, this, [=]() {
-                qDebug()<<"1";
                 level->Deletetank();
-                qDebug()<<"2";
                 level->Initmap();
-                qDebug()<<"3";
+                this->show();
+                level->close();
+            });
+
+            connect(level,&level1::backButWin,[=](){
+                pass_judge[0] = true;
+                colorChange(nextButton);
+                nextButton->setEnabled(true);
                 this->show();
                 level->close();
             });
@@ -145,7 +156,8 @@ void pass::setupLevel1Button(QPushButton *button, level2 *level, QPushButton *ne
     connect(button, &QPushButton::clicked, [=]() {
         QTimer::singleShot(500, this, [=]() {
             this->hide();
-
+            level->deletePassPage();
+            level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
             level->show();
@@ -166,6 +178,13 @@ void pass::setupLevel1Button(QPushButton *button, level2 *level, QPushButton *ne
                 this->show();
                 level->hide();
             });
+            connect(level,&level2::backButWin,[=](){
+                pass_judge[0] = true;
+                colorChange(nextButton);
+                nextButton->setEnabled(true);
+                this->show();
+                level->close();
+            });
         });
     });
 }
@@ -175,7 +194,8 @@ void pass::setupLevel2Button(QPushButton *button, level3 *level, QPushButton *ne
     connect(button, &QPushButton::clicked, [=]() {
         QTimer::singleShot(500, this, [=]() {
             this->hide();
-
+            level->deletePassPage();
+            level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
             level->show();
@@ -196,6 +216,13 @@ void pass::setupLevel2Button(QPushButton *button, level3 *level, QPushButton *ne
                 this->show();
                 level->hide();
             });
+            connect(level,&level3::backButWin,[=](){
+                pass_judge[0] = true;
+                colorChange(nextButton);
+                nextButton->setEnabled(true);
+                this->show();
+                level->close();
+            });
         });
     });
 }
@@ -205,7 +232,8 @@ void pass::setupLevel3Button(QPushButton *button, level4 *level)
     connect(button, &QPushButton::clicked, [=]() {
         QTimer::singleShot(500, this, [=]() {
             this->hide();
-
+            level->deletePassPage();
+            level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
             level->show();
@@ -220,6 +248,11 @@ void pass::setupLevel3Button(QPushButton *button, level4 *level)
             connect(level, &level4::back, this, [=]() {
                 level->Deletetank();
                 level->Initmap();
+                this->show();
+                level->close();
+            });
+            connect(level,&level4::backButWin,[=](){
+                pass_judge[0] = true;
                 this->show();
                 level->close();
             });
