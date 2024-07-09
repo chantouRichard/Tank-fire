@@ -21,35 +21,35 @@ public:
     int mapbuy;     //子弹的格子位置
     int boommapsitx;
     int boommapsity;
-    int enemyx; //记录对面阵营的x坐标
-    int enemyy; //记录对面阵营的y坐标
+    int *enemyx; //记录对面阵营的x坐标
+    int *enemyy; //记录对面阵营的y坐标
+    int enemy_num;
     bool started;    //记录是否开始计时
+
     QTimer *bullettimer;
-    QTimer *boomtimer;
-    QTimer *bigboomtimer;
-    int MAP[25][25];
     QPixmap BULL;
+    QLabel *BULA;
     QPixmap Boom;
     QPixmap Bigboom;
-    QLabel *BULA;
     QLabel *BOOM;
     QLabel *bigBOOM;
-
-    virtual void Loadmap(int map[25][25]);
+    QTimer *boomtimer;
+    QTimer *bigboomtimer;
+    void getenemysit(int*& x,int*& y);
+    void stoptimer();
     void movebullet(QWidget* parent,int style,int x,int y);//发射子弹的移动
     virtual bool checkmovebullet();//检查子弹是否可以继续移动
-    virtual void updatemapsit();
-    virtual void Disconnected();
-    virtual void moveup();
-    virtual void movedown();
-    virtual void moveleft();
-    virtual void moveright();
-    virtual void bulletboom(int boomsitx,int boomsity);
-    void updateenemy(int x,int y);
-    bool checkshootenemy();
-
+    void updatemapsit();
+    void Disconnected();
+    void moveup();
+    void movedown();
+    void moveleft();
+    void moveright();
+    void bulletboom(int boomsitx,int boomsity);
+    virtual bool checkshootenemy();
 signals:
-    virtual void boom(int x,int y);
+    void boom(int x,int y);
+    void kill_enemy(int i);
 };
 
 #endif // BULLET_H
