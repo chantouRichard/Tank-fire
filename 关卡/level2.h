@@ -7,11 +7,14 @@ class level2 : public Level
 {
     Q_OBJECT
 public:
+    QTimer *changeTimer;
     explicit level2(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *event) override;
+    void Initmap();
+    void keyPressEvent(QKeyEvent* event);
+
 private:
-    void initTank() override;
-    void initEnemyTank() override;
+
     void dead() override;
 
 };
