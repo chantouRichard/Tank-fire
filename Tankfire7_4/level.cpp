@@ -4,6 +4,7 @@
 #include <QBrush>
 #include <QPixmap>
 #include<QPaintEvent>
+#include<QRandomGenerator>
 
 Level::Level(QWidget *parent)
     : QWidget(parent) ,score(0){
@@ -14,12 +15,37 @@ Level::Level(QWidget *parent)
     setWindowTitle("tankfire");
     initColumn(statusBar,statusText);
     setupUI();
-    show_failpage_show=false;
+    //增加的代码
+    show_failpage_show = false;
+
+
+//    changeTimer->start(QRandomGenerator::global()->bounded(20000, 20001));
 }
 
 Level::~Level() {
     // 清理工作
 }
+
+void Level::initchangeTimer(){
+    changeTimer=new QTimer(this);
+    changeTimer->disconnect();
+    changeTimer->stop();
+    changeTimer->start(QRandomGenerator::global()->bounded(5000, 5500));
+    connect(changeTimer, &QTimer::timeout, this, &Level::onTimeout);
+}
+
+void Level::DeletechangTimer() {
+    if (changeTimer) {
+        if (changeTimer->isActive()) {
+            changeTimer->stop();
+        }
+        delete changeTimer;
+        changeTimer = nullptr; // 将指针设为 nullptr，以防后续访问无效指针
+    }
+}
+
+// 在其他地方调用 DeletechangTimer 之前，进行检查
+
 
 void Level::keyReleaseEvent(QKeyEvent *event){
     my_tank->keyReleaseEvent(event);
@@ -131,7 +157,7 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
     backButWinbutton->resize(150, 70);
     backButWinbutton->move(75, 1800);
 
-    replay=new QPushButton("Replay",this);
+    replay=new QPushButton("Replay",statusBar);
     replay->setStyleSheet(
                 "color:white;"
                 "font-size: 40px;"
@@ -156,6 +182,10 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
     connect(backButWinbutton,&QPushButton::clicked,[=](){
         emit this->backButWin();
     });
+
+    connect(replay,&QPushButton::clicked,[=]{
+        emit this->Replay();
+    });
 }
 
 void Level::paintEvent(QPaintEvent *event) {
@@ -164,6 +194,10 @@ void Level::paintEvent(QPaintEvent *event) {
 
     QPixmap pixWall1(":/1/Res/res/wall1.jpg");
     QPixmap pixWall2(":/1/Res/res/wall2.jpg");
+    QPixmap pixtool1(":/2/Res/res2/Heart.png");
+    QPixmap pixtool2(":/2/Res/res2/Shield.png");
+    QPixmap pixtool3(":/2/Res/res2/Attack.png");
+    QPixmap pixtool4(":/2/Res/res2/Speed.png");
 
     for (int i = 0; i < Mapx_size; ++i) {
         for (int j = 0; j < Mapy_size; ++j) {
@@ -172,11 +206,16 @@ void Level::paintEvent(QPaintEvent *event) {
             } else if (MAP_Global[j][i] == 2) {
                 painter.drawPixmap(j * 60, i * 60, 60, 60, pixWall2);
             }
+            else if(MAP_Global[j][i]==20){painter.drawPixmap(j*60,i*60,60,60,pixtool1);}
+            else if(MAP_Global[j][i]==30){painter.drawPixmap(j*60,i*60,60,60,pixtool2);}
+            else if(MAP_Global[j][i]==40){painter.drawPixmap(j*60,i*60,60,60,pixtool3);}
+            else if(MAP_Global[j][i]==50){painter.drawPixmap(j*60,i*60,60,60,pixtool4);}
         }
     }
 }
 
 void Level::updateTime(QLabel* statusText) {
+
     QDateTime currentTime = QDateTime::currentDateTime();
     qint64 secondsPassed = startTime.secsTo(currentTime);
 
@@ -225,6 +264,11 @@ void Level::initEnemyTank(int enemy_num) {
     for(int i=0;i<enemy_num;i++)
     {
         enemys[i]=new EnemyTank(enemy_x_site[i],enemy_y_site[i],my_tank,this);
+        //
+        if(i==1){
+        enemys[1]->enemytank_style=2;
+             }
+        //
         enemys[i]->showTank(this);
         for(int j=0;j<bulletsnumber;j++)
         {
@@ -232,10 +276,10 @@ void Level::initEnemyTank(int enemy_num) {
             connect(bul,&enemybullet::boom,this,&Level::updatemapforboom);
             connect(my_tank,&Tank::my_tank_move,bul,&enemybullet::getenemysit);
             connect(bul,&enemybullet::kill_my_tank,[=](){
-                  my_tank->my_tank_live=false;
-                  if(!show_failpage_show)
+                  my_tank->my_tank_live--;
+                  if(my_tank->my_tank_live<=0)show_failpage_show=true;
+                  if(show_failpage_show)
                       failPageShow();
-                  show_failpage_show=true;
             });
         }
         connect(enemys[i],&EnemyTank::enemy_move,this,&Level::updateenemysit);
@@ -266,6 +310,8 @@ void Level::Deletetank(){
     }
     delete my_tank;
     delete[] enemys;
+
+
 }
 
 void Level::updateenemysit(){
@@ -276,6 +322,7 @@ void Level::updateenemysit(){
 }
 
 void Level::clear_enemytank(int id){
+    if(enemys[id]->enemy_HP==1){
     score+=10;
     enemys[id]->live=0;
     enemys[id]->enemy_tank_img->hide();
@@ -283,6 +330,9 @@ void Level::clear_enemytank(int id){
     enemys[id]->currentX=-10;
     enemys[id]->currentY=-10;
     updateenemysit();
+    }
+    else
+       enemys[id]->enemy_HP--;
     bool check=1;
     for(int i=0;i<enemy_num;i++){
         if(enemys[i]->live){
@@ -298,6 +348,7 @@ void Level::clear_enemytank(int id){
 void Level::resetTime() {
     // 重置时间计数为0
     startTime = QDateTime::currentDateTime();
+    timer->start();
 }
 
 void Level::passPageShow() {
@@ -350,7 +401,7 @@ void Level::failPageShow()
     failPage->setStyleSheet("background-color: white;");
     failPage->setVisible(true);
     failPage->setStyleSheet("background-color: white; color: red; font-size: 100px; font-family: Comic Sans MS;");
-    failPage->setText("你输了，你是傻逼");
+    failPage->setText("YOU LOSE!");
     failPage->setAlignment(Qt::AlignCenter);
 }
 
@@ -402,6 +453,8 @@ void Level::grade() {
 void Level::deletePassPage()
 {
     failButton->move(75,1100);
+    backButWinbutton->move(75,1800);
+    backbutton->move(75,1300);
     next->move(75,1800);
     passPage->hide();
     ST1->hide();
@@ -415,4 +468,52 @@ void Level::deleteFailPage()
     passButton->move(75,1200);
     replay->move(75,1800);
     failPage->hide();
+}
+
+void Level::changeRandomZeroToOne() {
+    QVector<QPoint> zeroPositions;
+    for (int x = 0; x < Mapx_size; ++x) {
+        for (int y = 0; y < Mapy_size; ++y) {
+            if (MAP_Global[x][y] == 0) {
+                zeroPositions.append(QPoint(x, y));
+            }
+        }
+    }
+
+    if (!zeroPositions.isEmpty()) {
+        qDebug()<<"1";
+        int randomIndex = QRandomGenerator::global()->bounded(zeroPositions.size());
+        QPoint randomPoint = zeroPositions[randomIndex];
+        MAP_Global[randomPoint.x()][randomPoint.y()] = (rand()%4+2)*10;
+        update();
+    }
+}
+
+void Level::onTimeout() {
+    changeRandomZeroToOne();
+//    changeTimer->start(QRandomGenerator::global()->bounded(25000, 25001)); // 重新设置定时器
+}
+
+void Level::hide_all_tank(){
+    my_tank->tank_img->hide();
+    for(int i=0;i<bulletsnumber;i++){
+        my_tank->bugdet[i].BULA->hide();
+        my_tank->bugdet[i].BOOM->hide();
+        my_tank->bugdet[i].bigBOOM->hide();
+        my_tank->bugdet[i].BULA->move(-10,-10);
+    }
+    for(int i=0;i<enemy_num;i++)
+    {
+        enemys[i]->enemy_tank_img->hide();
+        enemys[i]->shootTimer->stop();
+        for(int j=0;j<bulletsnumber;j++){
+            enemys[i]->bullets[j].BULA->hide();
+            enemys[i]->bullets[j].BOOM->hide();
+            enemys[i]->bullets[j].bigBOOM->hide();
+            enemys[i]->bullets[j].BULA->move(-100,-100);
+            enemys[i]->bullets[j].enemyx=-200;
+            enemys[i]->bullets[j].enemyy=-200;
+        }
+
+    }
 }
