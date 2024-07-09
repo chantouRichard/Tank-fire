@@ -28,22 +28,31 @@ int level3map[Mapx_size][Mapy_size] = {
     {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
 };
 
+int initenemyx3[3]={120,240,360};
+int initenemyy3[3]={120,120,120};
+int my_tankx3=60;
+int my_tanky3=60;
 
 level3::level3(QWidget *parent) : Level(parent)
 {
-    loadMap(level3map);
+    statusBar = new QLabel(this);
+    statusText = new QLabel(statusBar);
+    Initmap();
+    show_failpage_show=false;
 }
-
+void level3::Initmap(){
+    resetTime();
+    loadMap(level3map);
+    initTank(3,initenemyx3,initenemyy3,my_tankx3,my_tanky3);
+    initEnemyTank(3);
+}
 void level3::paintEvent(QPaintEvent *event) {
     Level::paintEvent(event);
 }
 
-void level3::initTank() {
-    Level::initTank();
-}
-
-void level3::initEnemyTank() {
-    Level::initEnemyTank();
+void level3::keyPressEvent(QKeyEvent* event)
+{
+    my_tank->keyPressEvent(event);
 }
 
 void level3::dead() {
