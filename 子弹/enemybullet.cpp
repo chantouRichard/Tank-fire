@@ -46,3 +46,109 @@ void enemybullet::bulletboom(int boomsitx, int boomsity) {
     });
 
 }
+
+//void enemybullet::set_parent(EnemyTank *parent)
+//{
+//    this->parent=parent;
+//}
+bool enemybullet::checkshootenemy(){
+    if(bux>=enemyx&&bux<=(enemyx+60)&&buy>=enemyy&&buy<=(enemyy+60))
+        return true;
+    return false;
+}
+
+void enemybullet::getenemysit(int x,int y){
+    enemyx=x;
+    enemyy=y;
+}
+
+bool enemybullet::checkmovebullet(){
+    if(checkshootenemy()){
+        boommapsitx=mapbux;
+        boommapsity=mapbuy;
+        bulletboom(bux-50,buy-50);
+        emit boom(mapbux,mapbuy);
+        emit kill_my_tank();
+        return true;
+    }
+    if(type==1){
+        if((MAP_Global[mapbux][mapbuy]%10)!=0)
+        {
+            boommapsitx=mapbux;
+            boommapsity=mapbuy;
+            bulletboom(bux-50,buy-50);
+            emit boom(mapbux,mapbuy);
+            return true;
+        }
+        if(!(MAP_Global[mapbux][mapbuy-1]%10)){
+            return false;
+        }
+        else{
+            if(buy>60*mapbuy)
+                return false;
+            else{
+                boommapsitx=mapbux;
+                boommapsity=mapbuy-1;
+                bulletboom(bux-50,buy-50);
+                emit boom(mapbux,mapbuy-1);
+                return true;
+            }
+        }
+    }
+    if(type==2){
+        if(!(MAP_Global[mapbux][mapbuy+1]%10)){
+            return false;
+        }
+        else{
+            if(buy+5<60*(mapbuy+1)){
+                return false;
+            }
+            else{
+                boommapsitx=mapbux;
+                boommapsity=mapbuy+1;
+                bulletboom(bux-50,buy-50);
+                emit boom(mapbux,mapbuy+1);
+                return true;
+            }}
+    }
+    if(type==3){
+        if((MAP_Global[mapbux][mapbuy]%10)!=0){
+            boommapsitx=mapbux;
+            boommapsity=mapbuy;
+            bulletboom(bux-50,buy-50);
+            emit boom(mapbux,mapbuy);
+            return true;
+        }
+        if( !(MAP_Global[mapbux-1][mapbuy]%10))
+            return false;
+        else{
+            if(bux>60*mapbux)
+                return false;
+            else{
+                boommapsitx=mapbux-1;
+                boommapsity=mapbuy;
+                bulletboom(bux-50,buy-50);
+                emit boom(mapbux-1,mapbuy);
+                return true;
+            }
+        }
+    }
+    if(type==4){
+        if(! (MAP_Global[mapbux+1][mapbuy]%10))
+            return false;
+        else{
+            if(bux+5<60*(mapbux+1)){
+                return false;
+            }
+            else{
+                boommapsitx=mapbux+1;
+                boommapsity=mapbuy;
+                bulletboom(bux-50,buy-50);
+                emit boom(mapbux+1,mapbuy);
+                return true;
+            }
+        }
+    }
+
+}
+
