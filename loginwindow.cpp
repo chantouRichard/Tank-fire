@@ -15,6 +15,7 @@
 #include <QFontDatabase>
 #include <QTimer>
 #include <QPainter>
+#include <QGraphicsDropShadowEffect>
 
 LoginWindow::LoginWindow(QWidget *parent) : QWidget(parent)
 {
@@ -33,16 +34,23 @@ LoginWindow::LoginWindow(QWidget *parent) : QWidget(parent)
     canvas->setStyleSheet("background-color: rgba(255, 255, 255, 200); border-radius: 15px;");
     canvas->setGeometry((this->width() - 800) / 2, (this->height() - 600) / 2, 800, 600); // 调整画布位置和大小
 
+    // 添加阴影效果
+    QGraphicsDropShadowEffect *shadowEffect = new QGraphicsDropShadowEffect(this);
+    shadowEffect->setBlurRadius(20);
+    shadowEffect->setColor(QColor(0, 0, 0, 160));
+    shadowEffect->setOffset(0, 0);
+    canvas->setGraphicsEffect(shadowEffect);
+
     // 设置布局
     mainLayout = new QVBoxLayout(canvas);
     mainLayout->setAlignment(Qt::AlignCenter); // 居中对齐布局
 
     titleLabel = new QLabel("Login", this);
-    titleLabel->setStyleSheet("color: rgba(0, 0, 0, 150); font-size: 58px; font-weight: bold; background-color: transparent;"); // 设置半透明字体颜色和透明背景
+    titleLabel->setStyleSheet("color: rgba(0, 0, 0, 150); font-size: 68px; font-weight: bold; background-color: transparent;"); // 设置半透明字体颜色和透明背景
     titleLabel->setAlignment(Qt::AlignCenter);
     int fontId = QFontDatabase::addApplicationFont(DottedFont);
     QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
-    QFont customFont(fontFamily, 16);
+    QFont customFont(fontFamily, 20);
     titleLabel->setFont(customFont);
 
     // 创建标签和输入框
@@ -55,17 +63,23 @@ LoginWindow::LoginWindow(QWidget *parent) : QWidget(parent)
     passwordEdit->setEchoMode(QLineEdit::Password); // 输入加密
     passwordEdit->setStyleSheet("color: black; font-size: 24px;"); // 设置字体颜色为黑色
 
+    int fontId1 = QFontDatabase::addApplicationFont(Iron);
+    QString fontFamily1 = QFontDatabase::applicationFontFamilies(fontId1).at(0);
+    QFont customFont1(fontFamily1, 12);
+
     loginButton = new HoverFillButton(this, HoverFillButton::AnimationType::CrossFill);
     loginButton->setText("登录");
     loginButton->setFillBrush(QBrush(QColor("#00AA73")));
     loginButton->setTextColor(QColor("#87CEEB"), QColor("#FFFFFF"));
     loginButton->setRadius(30);
+    loginButton->setFont(customFont1);
 
     registerButton = new HoverFillButton(this, HoverFillButton::AnimationType::CrossFill);
     registerButton->setText("注册");
     registerButton->setFillBrush(QBrush(QColor("#00AA73")));
     registerButton->setTextColor(QColor("#87CEEB"), QColor("#FFFFFF"));
     registerButton->setRadius(30);
+    registerButton->setFont(customFont1);
 
     // 设置按钮和输入框的更大大小
     loginButton->setMinimumSize(250, 80);
@@ -107,6 +121,17 @@ LoginWindow::LoginWindow(QWidget *parent) : QWidget(parent)
     mainLayout->setMargin(50); // 增大外边距
     mainLayout->setSpacing(40); // 增大控件之间的间距
 
+    // 初始化消息对话框
+    messageSnackbar = new QtMaterialSnackbar(this);
+    messageSnackbar->setBackgroundColor(QColor(232,230,240)); // 设置背景颜色
+    messageSnackbar->setTextColor(QColor(58,46,121)); // 设置文字颜色
+    messageSnackbar->setBackgroundOpacity(0.8); // 设置背景透明度
+    messageSnackbar->setFont(customFont1); // 设置字体大小
+    messageSnackbar->setBoxWidth(1000); // 设置Snackbar的宽度
+    messageSnackbar->setAutoHideDuration(3000); // 自动隐藏持续时间
+    messageSnackbar->setClickToDismissMode(true); // 点击外部隐藏
+
+
     // 连接信号和槽
     connect(loginButton, &QPushButton::clicked, this, &LoginWindow::on_loginButton_clicked);
     connect(registerButton, &QPushButton::clicked, this, &LoginWindow::on_reginButton_clicked);
@@ -132,7 +157,7 @@ void LoginWindow::on_loginButton_clicked()
     if (checkLogin(username, password))
         emit success_to_enter();
     else
-        QMessageBox::critical(this, "登录失败", "账号或密码有误");
+        showMessageSnackbar("账号或密码错误"); // 显示登录失败
 }
 
 bool LoginWindow::checkLogin(const QString &username, const QString &password)
@@ -169,7 +194,7 @@ void LoginWindow::on_reginButton_clicked()
 
     // 确保用户名和密码不为空
     if (username.isEmpty() || password.isEmpty()) {
-        QMessageBox::warning(this, "注册失败", "账号和密码不能为空");
+        showMessageSnackbar("账号和密码不能为空"); // 显示注册失败消息
         return;
     }
 
@@ -190,7 +215,7 @@ void LoginWindow::on_reginButton_clicked()
         QStringList data = line.split(":"); // 假设账号和密码以":"分隔
         if (username == data[0])
         {
-            QMessageBox::information(this, "提醒", "该账号已存在");
+            showMessageSnackbar("该账号已存在"); // 显示账号已存在消息
             file1.close();
             return;
         }
@@ -207,5 +232,10 @@ void LoginWindow::on_reginButton_clicked()
     file.close();
 
     // 显示注册成功的消息
-    QMessageBox::information(this, "注册成功", "账号注册成功，请重新运行，并使用注册的账号登录。");
+    showMessageSnackbar("账号注册成功"); // 显示注册成功消息
+}
+
+void LoginWindow::showMessageSnackbar(const QString &message)
+{
+    messageSnackbar->addMessage(message);
 }

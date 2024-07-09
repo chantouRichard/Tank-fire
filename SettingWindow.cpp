@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QPalette>
 #include <QLabel>
+#include<QFontDatabase>
 
 SettingWindow::SettingWindow(QWidget *parent)
     : QWidget(parent),
@@ -92,11 +93,16 @@ SettingWindow::SettingWindow(QWidget *parent)
     volumeSettingsPage->setVisible(false);
     skinSettingsPage->setVisible(false);
 
+    int fontId = QFontDatabase::addApplicationFont(Iron);
+    QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
+    QFont customFont(fontFamily, 14);
+
     returnButton = new HoverFillButton("返回", this);
     returnButton->setGeometry(1800, 1100, 150, 50); // Position returnButton in bottom-right corner
     returnButton->setFillBrush(QBrush(QColor("#00AA73")));
     returnButton->setTextColor(QColor("#87CEEB"), QColor("#FFFFFF"));
     returnButton->setRadius(30);
+    returnButton->setFont(customFont);
     connect(returnButton, &QPushButton::clicked, this, &SettingWindow::handleReturn);
 }
 
@@ -122,11 +128,12 @@ QWidget* SettingWindow::createKeySettingsPage()
     imageLabel_prop->setGeometry(650, 60, 100, 100); // Adjusted size and position
     imageLabel_prop->setScaledContents(true);
 
-    KeyUpButton = new QtMaterialRaisedButton("上: " + QKeySequence(KeyUp).toString(), page);
-    keyDownButton = new QtMaterialRaisedButton("下: " + QKeySequence(KeyDown).toString(), page);
-    KeyLeftButton = new QtMaterialRaisedButton("左: " + QKeySequence(KeyLeft).toString(), page);
-    KeyRightButton = new QtMaterialRaisedButton("右: " + QKeySequence(KeyRight).toString(), page);
-    KeyShootButton = new QtMaterialRaisedButton("射击: " + QKeySequence(KeyShoot).toString(), page);
+
+    KeyUpButton = new QtMaterialRaisedButton("上: W", page);
+    keyDownButton = new QtMaterialRaisedButton("下: S", page);
+    KeyLeftButton = new QtMaterialRaisedButton("左: A", page);
+    KeyRightButton = new QtMaterialRaisedButton("右: D", page);
+    KeyShootButton = new QtMaterialRaisedButton("射击: J", page);
     KeyProp1Button = new QtMaterialRaisedButton("第一个道具: " + QKeySequence(KeyProp1).toString(), page);
     KeyProp2Button = new QtMaterialRaisedButton("第二个道具: " + QKeySequence(KeyProp2).toString(), page);
     KeyProp3Button = new QtMaterialRaisedButton("第三个道具: " + QKeySequence(KeyProp3).toString(), page);
@@ -173,71 +180,114 @@ QWidget* SettingWindow::createVolumeSettingsPage()
 {
     QWidget *page = new QWidget(this);
 
-        main_volumeLabel = new QLabel(page);
-        setupVolumeLabel(main_volumeLabel, "主音量");
-        main_volumeLabel->setGeometry(40, 30, 250, 75);
+    main_volumeLabel = new QLabel(page);
+    setupVolumeLabel(main_volumeLabel, "主音量");
+    main_volumeLabel->setGeometry(40, 30, 250, 75);
 
-        button_volumeLabel = new QLabel(page);
-        setupVolumeLabel(button_volumeLabel, "按钮音量");
-        button_volumeLabel->setGeometry(40, 230, 250, 75);
+    button_volumeLabel = new QLabel(page);
+    setupVolumeLabel(button_volumeLabel, "按钮音量");
+    button_volumeLabel->setGeometry(40, 230, 250, 75);
 
-        boom_volumeLabel = new QLabel(page);
-        setupVolumeLabel(boom_volumeLabel, "爆炸音量");
-        boom_volumeLabel->setGeometry(40, 430, 250, 75);
+    boom_volumeLabel = new QLabel(page);
+    setupVolumeLabel(boom_volumeLabel, "爆炸音量");
+    boom_volumeLabel->setGeometry(40, 430, 250, 75);
 
-        victory_volumeLabel = new QLabel(page);
-        setupVolumeLabel(victory_volumeLabel, "胜利音量");
-        victory_volumeLabel->setGeometry(640, 30, 250, 75);
+    victory_volumeLabel = new QLabel(page);
+    setupVolumeLabel(victory_volumeLabel, "胜利音量");
+    victory_volumeLabel->setGeometry(640, 30, 250, 75);
 
-        fail_volumeLabel = new QLabel(page);
-        setupVolumeLabel(fail_volumeLabel, "失败音量");
-        fail_volumeLabel->setGeometry(640, 230, 250, 75);
+    fail_volumeLabel = new QLabel(page);
+    setupVolumeLabel(fail_volumeLabel, "失败音量");
+    fail_volumeLabel->setGeometry(640, 230, 250, 75);
 
-        prop_volumeLabel = new QLabel(page);
-        setupVolumeLabel(prop_volumeLabel, "道具音量");
-        prop_volumeLabel->setGeometry(640, 430, 250, 75);
+    prop_volumeLabel = new QLabel(page);
+    setupVolumeLabel(prop_volumeLabel, "道具音量");
+    prop_volumeLabel->setGeometry(640, 430, 250, 75);
 
-        QtMaterialSlider *main_volumeSlider = new QtMaterialSlider(page);
-        setupSlider(main_volumeSlider, gameVolume);
-        setSlide(main_volumeSlider, 40, 120, 400, 40);
+    QtMaterialSlider *main_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(main_volumeSlider, gameVolume);
+    setSlide(main_volumeSlider, 40, 120, 400, 40);
 
-        QtMaterialSlider *button_volumeSlider = new QtMaterialSlider(page);
-        setupSlider(button_volumeSlider, buttonVolumn);
-        setSlide(button_volumeSlider, 40, 320, 400, 50);
+    QtMaterialSlider *button_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(button_volumeSlider, buttonVolumn);
+    setSlide(button_volumeSlider, 40, 320, 400, 50);
 
-        QtMaterialSlider *boom_volumeSlider = new QtMaterialSlider(page);
-        setupSlider(boom_volumeSlider, boomVolumn);
-        setSlide(boom_volumeSlider, 40, 520, 400, 50);
+    QtMaterialSlider *boom_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(boom_volumeSlider, boomVolumn);
+    setSlide(boom_volumeSlider, 40, 520, 400, 50);
 
-        QtMaterialSlider *victory_volumeSlider = new QtMaterialSlider(page);
-        setupSlider(victory_volumeSlider, victoryVolume);
-        setSlide(victory_volumeSlider, 640, 120, 400, 50);
+    QtMaterialSlider *victory_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(victory_volumeSlider, victoryVolume);
+    setSlide(victory_volumeSlider, 640, 120, 400, 50);
 
-        QtMaterialSlider *fail_volumeSlider = new QtMaterialSlider(page);
-        setupSlider(fail_volumeSlider, failVolume);
-        setSlide(fail_volumeSlider, 640, 320, 400, 50);
+    QtMaterialSlider *fail_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(fail_volumeSlider, failVolume);
+    setSlide(fail_volumeSlider, 640, 320, 400, 50);
 
-        QtMaterialSlider *prop_volumeSlider = new QtMaterialSlider(page);
-        setupSlider(prop_volumeSlider, propVolume);
-        setSlide(prop_volumeSlider, 640, 520, 400, 50);
+    QtMaterialSlider *prop_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(prop_volumeSlider, propVolume);
+    setSlide(prop_volumeSlider, 640, 520, 400, 50);
 
-        connect(main_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleMainVolumeChange);
-        connect(button_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleButtonVolumeChange);
-        connect(boom_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleBoomVolumeChange);
-        connect(victory_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleVictoryVolumeChange);
-        connect(fail_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleFailVolumeChange);
-        connect(prop_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handlePropVolumeChange);
+    connect(main_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleMainVolumeChange);
+    connect(button_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleButtonVolumeChange);
+    connect(boom_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleBoomVolumeChange);
+    connect(victory_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleVictoryVolumeChange);
+    connect(fail_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleFailVolumeChange);
+    connect(prop_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handlePropVolumeChange);
 
-        page->show();
-        return page;
+    page->show();
+    return page;
 }
-
 
 QWidget* SettingWindow::createSkinSettingsPage()
 {
     QWidget *page = new QWidget(this);
 
-    // Add your skin setting widgets here
+    QGraphicsView *view = new QGraphicsView(page);
+    QGraphicsScene *scene = new QGraphicsScene(view);
+
+    scene->setBackgroundBrush(QColor(186,203,214,100));
+    view->setStyleSheet("background: transparent; border: none;"); // 设置背景透明和无边框
+    view->setScene(scene);
+    view->setGeometry(0, 0, 1200, 950);
+
+    QPixmap tank1(":/resource/tank/3.png");
+    QPixmap tank2(":/resource/tank/33.png");
+    QPixmap tank3(":/resource/tank/333.png");
+    QPixmap tank4(":/resource/tank/3333.png");
+    QPixmap tank5(":/resource/tank/33333.png");
+    QPixmap tank6(":/resource/tank/333333.png");
+
+    item1 =  new GraphicsPicItem(tank1.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    item2 =  new GraphicsPicItem(tank2.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    item3 =  new GraphicsPicItem(tank3.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    item4 =  new GraphicsPicItem(tank4.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    item5 =  new GraphicsPicItem(tank5.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    item6 =  new GraphicsPicItem(tank6.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    item1->setPos(-20, 40);
+    item2->setPos(550, 40);
+    item3->setPos(-20, 340);
+    item4->setPos(550, 340);
+    item5->setPos(-20, 640);
+    item6->setPos(550, 640);
+
+
+    scene->addItem(item1);
+    scene->addItem(item2);
+    scene->addItem(item3);
+    scene->addItem(item4);
+    scene->addItem(item5);
+    scene->addItem(item6);
+
+    item1->m_selected=true;
+
+    connect(item1, &GraphicsPicItem::clicked, this, &SettingWindow::chooseTank1);
+    connect(item2, &GraphicsPicItem::clicked, this, &SettingWindow::chooseTank2);
+    connect(item3, &GraphicsPicItem::clicked, this, &SettingWindow::chooseTank3);
+    connect(item4, &GraphicsPicItem::clicked, this, &SettingWindow::chooseTank4);
+    connect(item5, &GraphicsPicItem::clicked, this, &SettingWindow::chooseTank5);
+    connect(item6, &GraphicsPicItem::clicked, this, &SettingWindow::chooseTank6);
 
     page->show();
     return page;
@@ -358,6 +408,12 @@ void SettingWindow::setupButton(QtMaterialRaisedButton*& button)
     //                "   background-color: #0B60AD;"   // 按下时背景颜色
     //                "}"
     //                );
+
+    int fontId = QFontDatabase::addApplicationFont(Iron);
+    QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
+    QFont customFont(fontFamily, 28);
+
+    button->setFont(customFont);
     button->setForegroundColor(Qt::white);
     button->setBackgroundColor(QColor(84,115,125,30));
 
@@ -377,15 +433,17 @@ void SettingWindow::setupVolumeLabel(QLabel *&label, const QString &text)
 {
     label->setText(text);
     label->setStyleSheet(
-        "QLabel {"
-        "   font-size: 28px;"
-        "   font-weight: bold;"
-        "   color: #FFFFFF;"
-        "}"
-    );
+                "QLabel {"
+                "   font-size: 28px;"
+                "   font-weight: bold;"
+                "   color: #FFFFFF;"
+                "}"
+                );
+    int fontId = QFontDatabase::addApplicationFont(Iron);
+    QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
+    QFont customFont(fontFamily, 25);
 
-    QFont font("Helvetica", 25, QFont::Bold);
-    label->setFont(font);
+    label->setFont(customFont);
 
 }
 
@@ -403,4 +461,82 @@ void SettingWindow::setupSlider(QtMaterialSlider *&slider, int volume)
 void SettingWindow::setSlide(QtMaterialSlider *&slider, int x, int y, int width, int height)
 {
     slider->setGeometry(x, y, width, height);
+}
+
+void SettingWindow::chooseTank1()
+{
+    TankUp=":/resource/tank/3.png";
+    TankRight=":/resource/tank/4.png";
+    TankDown=":/resource/tank/1.png";
+    TankLeft=":/resource/tank/2.png";
+    item2->m_selected=false;item2->update();
+    item3->m_selected=false;item3->update();
+    item4->m_selected=false;item4->update();
+    item5->m_selected=false;item5->update();
+    item6->m_selected=false;item6->update();
+}
+
+void SettingWindow::chooseTank2()
+{
+    TankUp=":/resource/tank/33.png";
+    TankRight=":/resource/tank/44.png";
+    TankDown=":/resource/tank/11.png";
+    TankLeft=":/resource/tank/22.png";
+    item1->m_selected=false;item1->update();
+    item3->m_selected=false;item3->update();
+    item4->m_selected=false;item4->update();
+    item5->m_selected=false;item5->update();
+    item6->m_selected=false;item6->update();
+}
+
+void SettingWindow::chooseTank3()
+{
+    TankUp=":/resource/tank/333.png";
+    TankRight=":/resource/tank/444.png";
+    TankDown=":/resource/tank/111.png";
+    TankLeft=":/resource/tank/222.png";
+    item2->m_selected=false;item1->update();
+    item1->m_selected=false;item2->update();
+    item4->m_selected=false;item4->update();
+    item5->m_selected=false;item5->update();
+    item6->m_selected=false;item6->update();
+}
+
+void SettingWindow::chooseTank4()
+{
+    TankUp=":/resource/tank/3333.png";
+    TankRight=":/resource/tank/4444.png";
+    TankDown=":/resource/tank/1111.png";
+    TankLeft=":/resource/tank/2222.png";
+    item2->m_selected=false;item1->update();
+    item3->m_selected=false;item2->update();
+    item1->m_selected=false;item3->update();
+    item5->m_selected=false;item5->update();
+    item6->m_selected=false;item6->update();
+}
+
+void SettingWindow::chooseTank5()
+{
+    TankUp=":/resource/tank/33333.png";
+    TankRight=":/resource/tank/44444.png";
+    TankDown=":/resource/tank/11111.png";
+    TankLeft=":/resource/tank/22222.png";
+    item2->m_selected=false;item1->update();
+    item3->m_selected=false;item2->update();
+    item4->m_selected=false;item3->update();
+    item1->m_selected=false;item4->update();
+    item6->m_selected=false;item6->update();
+}
+
+void SettingWindow::chooseTank6()
+{
+    TankUp=":/resource/tank/333333.png";
+    TankRight=":/resource/tank/444444.png";
+    TankDown=":/resource/tank/111111.png";
+    TankLeft=":/resource/tank/222222.png";
+    item2->m_selected=false;item1->update();
+    item3->m_selected=false;item2->update();
+    item4->m_selected=false;item3->update();
+    item5->m_selected=false;item4->update();
+    item1->m_selected=false;item5->update();
 }

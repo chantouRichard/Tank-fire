@@ -11,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPropertyAnimation>
+#include<QFontDatabase>
 
 HistoryscoreWindow::HistoryscoreWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -36,7 +37,7 @@ void HistoryscoreWindow::setupUI()
 
     // 设置整个窗口的背景图片
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(QPixmap(":/1/Res/res/score_back.png"))); // 引用资源文件中的背景图片
+    palette.setBrush(QPalette::Background, QBrush(QPixmap(score_back_pic))); // 引用资源文件中的背景图片
     this->setAutoFillBackground(true);
     this->setPalette(palette);
 
@@ -51,12 +52,6 @@ void HistoryscoreWindow::setupUI()
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->setContentsMargins(20, 20, 20, 20);
 
-    // 添加顶部透明区域 - 图片上移的逻辑语句块
-    QWidget* topSpacer = new QWidget(centralWidget);
-    topSpacer->setFixedHeight(100); // 你可以调整这个值来改变图片向上移动的距离
-    topSpacer->setStyleSheet("background: transparent;");
-    mainLayout->addWidget(topSpacer);
-
     // 创建分数表格
     scoreTableWidget = new QTableWidget(centralWidget);
     scoreTableWidget->setStyleSheet(
@@ -70,21 +65,24 @@ void HistoryscoreWindow::setupUI()
                 "   padding: 10px;"      // 单元格内边距
                 "}"
                 "QTableWidget::item:selected {"
-                "   background-color: rgba(30, 144, 255, 150);" // 选中行背景颜色
-                "   color: black;"             // 选中行文字颜色
+                "   background-color: rgba(242,235,221, 150);" // 选中行背景颜色
+                "   color: rgba(249,255,121,255);"             // 选中行文字颜色
                 "}"
                 "QHeaderView::section {"
                 "   background-color: rgba(255, 255, 255, 0);"  // 表头背景透明
                 "   color: white;"             // 表头字体颜色
-                "   font-size: 32px;"          // 表头字体大小
+                "   font-size: 40px;"          // 表头字体大小
                 "   font-family: 'Verdana', sans-serif;"  // 表头字体
                 "   border: none;"                         // 无边框
                 "}"
                 );
 
     // 设置表格中的字体样式
-    QFont font("Verdana", 24, QFont::Bold); // 设置字体为 Verdana，大小24，加粗
-    scoreTableWidget->setFont(font);
+    int fontId = QFontDatabase::addApplicationFont(AI);
+    QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
+    QFont customFont(fontFamily, 16);
+    customFont.setBold(true);
+    scoreTableWidget->setFont(customFont);
 
     // 设置表头
     scoreTableWidget->setColumnCount(2);
@@ -92,14 +90,20 @@ void HistoryscoreWindow::setupUI()
     scoreTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     // 设置表头视图的字体样式
-    QFont headerFont("Verdana", 32, QFont::Bold); // 设置表头字体为 Verdana，大小32，加粗
-    scoreTableWidget->horizontalHeader()->setFont(headerFont);
-    scoreTableWidget->verticalHeader()->setVisible(false); // 隐藏行号
+    int fontId2 = QFontDatabase::addApplicationFont(Ink);
+    QString fontFamily2 = QFontDatabase::applicationFontFamilies(fontId2).at(0);
+    QFont customFont2(fontFamily2, 28);
+    customFont2.setBold(true);
+
+    scoreTableWidget->horizontalHeader()->setFont(customFont2);
+    scoreTableWidget->verticalHeader()->setVisible(true); // 隐藏行号
 
     scoreTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     scoreTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    scoreTableWidget->setDragEnabled(true);
-    scoreTableWidget->setDragDropMode(QAbstractItemView::InternalMove);
+    scoreTableWidget->setDragEnabled(false);
+    scoreTableWidget->setDragDropMode(QAbstractItemView::NoDragDrop);
+    scoreTableWidget->setDragDropOverwriteMode(false);
+    scoreTableWidget->setDropIndicatorShown(false);
 
     // 启用滚动条并设置隐藏/显示效果
     verticalScrollBar = new QtMaterialScrollBar(scoreTableWidget);
@@ -122,25 +126,17 @@ void HistoryscoreWindow::setupUI()
 
     mainLayout->addWidget(scoreTableWidget);
 
+    int fontId1 = QFontDatabase::addApplicationFont(Iron);
+    QString fontFamily1 = QFontDatabase::applicationFontFamilies(fontId1).at(0);
+    QFont customFont1(fontFamily1, 14);
+
     // 创建返回按钮
-    returnButton = new QPushButton("返回", centralWidget);
-    returnButton->setStyleSheet(
-                "QPushButton {"
-                "   font-size: 32px;"
-                "   font-weight: bold;"
-                "   color: white;"
-                "   border: 2px solid #FFD700;"  // 边框颜色
-                "   border-radius: 10px;"        // 圆角
-                "   background-color: rgba(0, 0, 0, 0);" // 内部颜色透明
-                "   padding: 8px;"
-                "}"
-                "QPushButton:hover {"
-                "   border-color: #FFA500;"
-                "}"
-                "QPushButton:pressed {"
-                "   border-color: #FF8C00;"
-                "}"
-                );
+    returnButton = new HoverFillButton("返回", this);
+    returnButton->setGeometry(1800, 1100, 150, 50); // Position returnButton in bottom-right corner
+    returnButton->setFillBrush(QBrush(QColor("#424c50")));
+    returnButton->setTextColor(QColor("#61ac85"), QColor("#FFFFFF"));
+    returnButton->setRadius(12);
+    returnButton->setFont(customFont);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();

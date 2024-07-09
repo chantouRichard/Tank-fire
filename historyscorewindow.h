@@ -7,7 +7,7 @@
 #include <QTableWidget>
 #include <QCoreApplication>
 #include "qtmaterialscrollbar.h"
-
+#include"simplebutton.h"
 class HistoryscoreWindow : public QMainWindow
 {
     Q_OBJECT
@@ -16,7 +16,7 @@ public:
     explicit HistoryscoreWindow(QWidget *parent = nullptr);
     ~HistoryscoreWindow();
 
-    QPushButton* returnButton; // 返回按钮公共属性
+    HoverFillButton* returnButton; // 返回按钮公共属性
 
 private:
     QTableWidget* scoreTableWidget;

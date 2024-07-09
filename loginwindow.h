@@ -1,7 +1,6 @@
 #ifndef LOGINWINDOW_H
 #define LOGINWINDOW_H
 
-#include "global.h"
 #include <QWidget>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -10,8 +9,10 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QTimer>
+#include"global.h"
 #include "simplebutton.h"
 #include "qtmaterialautocomplete.h"
+#include "qtmaterialsnackbar.h" // include snackbar header
 
 class LoginWindow : public QWidget
 {
@@ -28,6 +29,7 @@ signals:
     void HideMainWindow();
 
 private:
+    QtMaterialSnackbar *messageSnackbar;
     QVBoxLayout *mainLayout;
     QtMaterialAutoComplete* usernameEdit;
     QtMaterialAutoComplete* passwordEdit;
@@ -37,7 +39,7 @@ private:
     QLabel* backgroundLabel;
     QWidget* canvas;
     QTimer* timer;
-
+    void showMessageSnackbar(const QString &message);
     bool checkLogin(const QString& username, const QString& password);
     void centerCanvas();
 };

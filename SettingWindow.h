@@ -2,6 +2,9 @@
 #define SETTINGWINDOW_H
 
 #include <QWidget>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include "mygraphicspicitem.h"
 #include <QSlider>
 #include <QLabel>
 #include <QKeyEvent>
@@ -25,6 +28,7 @@ public:
     void setupVolumeLabel(QLabel *&label, const QString &text);
     void setupSlider(QtMaterialSlider *&slider, int volume);
     void setSlide(QtMaterialSlider *&slider, int x, int y, int width, int height);
+    void addTankItem(const QString &imagePath, int x, int y, const char *slot);
 private slots:
     void handleMainVolumeChange(int value);
     void handleButtonVolumeChange(int value);
@@ -34,6 +38,12 @@ private slots:
     void handlePropVolumeChange(int value);
     void handleKeyChange();
     void handleReturn();
+    void chooseTank1();
+    void chooseTank2();
+    void chooseTank3();
+    void chooseTank4();
+    void chooseTank5();
+    void chooseTank6();
 
 signals:
     void ret_sign();
@@ -71,6 +81,13 @@ private:
 
     QtMaterialRaisedButton *currentKeyButton;
     HoverFillButton *returnButton;
+
+    GraphicsPicItem *item1;
+    GraphicsPicItem *item2;
+    GraphicsPicItem *item3;
+    GraphicsPicItem *item4;
+    GraphicsPicItem *item5;
+    GraphicsPicItem *item6;
 
     QWidget *createKeySettingsPage();
     QWidget *createVolumeSettingsPage();
