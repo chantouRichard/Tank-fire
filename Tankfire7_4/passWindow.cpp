@@ -113,12 +113,18 @@ void pass::setupLevel0Button(QPushButton *button, level1 *level, QPushButton *ne
             level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
+            level->initchangeTimer();
             level->show();
             for(int i=0;i<level->enemy_num;i++){
                 level->enemys[i]->startshoottime();
             }
             connect(level, &level1::Win, [=]() {
                 pass_judge[0] = true;
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                    qDebug()<<"Del";
+                }
                 colorChange(nextButton);
                 nextButton->setEnabled(true);
                 this->show();
@@ -128,18 +134,38 @@ void pass::setupLevel0Button(QPushButton *button, level1 *level, QPushButton *ne
             });
 
             connect(level, &level1::back, this, [=]() {
+//                level->hide_all_tank();
                 level->Deletetank();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 level->Initmap();
                 this->show();
                 level->close();
             });
 
             connect(level,&level1::backButWin,[=](){
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 pass_judge[0] = true;
                 colorChange(nextButton);
                 nextButton->setEnabled(true);
                 this->show();
                 level->close();
+            });
+
+            connect(level,&level1::Replay,[=]{
+                this->show();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
+                level->close();
+                button->clicked();
+                this->hide();
             });
         });
     });
@@ -154,32 +180,58 @@ void pass::setupLevel1Button(QPushButton *button, level2 *level, QPushButton *ne
             level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
+            level->initchangeTimer();
             level->show();
-            for(int i=0;i<level->enemy_num;i++){
-                level->enemys[i]->startshoottime();
-            }
+
+
+//            for(int i=0;i<level->enemy_num;i++){
+//                level->enemys[i]->startshoottime();
+//            }
             connect(level, &level2::Win, [=]() {
                 pass_judge[1] = true;
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 colorChange(nextButton);
                 nextButton->setEnabled(true);
                 this->show();
                 level->close();
                 nextButton->click();
                 this->hide();
-            });
 
+            });
             connect(level, &level2::back, this, [=]() {
                 level->Deletetank();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 level->Initmap();
                 this->show();
-                level->hide();
+                level->close();
             });
             connect(level,&level2::backButWin,[=](){
                 pass_judge[0] = true;
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 colorChange(nextButton);
                 nextButton->setEnabled(true);
                 this->show();
                 level->close();
+
+            });
+            connect(level,&level2::Replay,[=]{
+                this->show();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
+                level->close();
+                button->clicked();
+                this->hide();
             });
         });
     });
@@ -194,12 +246,17 @@ void pass::setupLevel2Button(QPushButton *button, level3 *level, QPushButton *ne
             level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
+            level->initchangeTimer();
             level->show();
-            for(int i=0;i<level->enemy_num;i++){
-                level->enemys[i]->startshoottime();
-            }
+//            for(int i=0;i<level->enemy_num;i++){
+//                level->enemys[i]->startshoottime();
+//            }
             connect(level, &level3::Win, [=]() {
                 pass_judge[2] = true;
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 colorChange(nextButton);
                 nextButton->setEnabled(true);
                 this->show();
@@ -210,16 +267,34 @@ void pass::setupLevel2Button(QPushButton *button, level3 *level, QPushButton *ne
 
             connect(level, &level3::back, this, [=]() {
                 level->Deletetank();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 level->Initmap();
                 this->show();
-                level->hide();
+                level->close();
             });
             connect(level,&level3::backButWin,[=](){
                 pass_judge[0] = true;
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 colorChange(nextButton);
                 nextButton->setEnabled(true);
                 this->show();
                 level->close();
+            });
+            connect(level,&level3::Replay,[=]{
+                this->show();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
+                level->close();
+                button->clicked();
+                this->hide();
             });
         });
     });
@@ -234,12 +309,17 @@ void pass::setupLevel3Button(QPushButton *button, level4 *level)
             level->deleteFailPage();
             level->Deletetank();
             level->Initmap();
+            level->initchangeTimer();
             level->show();
-            for(int i=0;i<level->enemy_num;i++){
-                level->enemys[i]->startshoottime();
-            }
+//            for(int i=0;i<level->enemy_num;i++){
+//                level->enemys[i]->startshoottime();
+//            }
             connect(level, &level4::Win, [=]() {
                 pass_judge[3] = true;
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 colorChange(button);
                 this->show();
                 level->close();
@@ -247,6 +327,10 @@ void pass::setupLevel3Button(QPushButton *button, level4 *level)
 
             connect(level, &level4::back, this, [=]() {
                 level->Deletetank();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 level->Initmap();
                 this->show();
                 level->close();
@@ -254,7 +338,21 @@ void pass::setupLevel3Button(QPushButton *button, level4 *level)
             connect(level,&level4::backButWin,[=](){
                 pass_judge[0] = true;
                 this->show();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
                 level->close();
+            });
+            connect(level,&level4::Replay,[=]{
+                this->show();
+                if (level->changeTimer)
+                {
+                    level->DeletechangTimer();
+                }
+                level->close();
+                button->clicked();
+                this->hide();
             });
         });
     });
