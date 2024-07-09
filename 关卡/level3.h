@@ -7,13 +7,17 @@ class level3 : public Level
 {
     Q_OBJECT
 public:
+    QTimer *changeTimer;
     explicit level3(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *event) override;
-
+    void keyPressEvent(QKeyEvent* event);
+    void Initmap();
+    QLabel *timeLabel;
+    QLabel *scoreLabel;
+    QTimer *timer;
+    int gameTime;
+    int gameScore;
 private:
-
-    void initTank() override;
-    void initEnemyTank() override;
     void dead() override;
 
 };
