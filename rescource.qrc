@@ -1,0 +1,89 @@
+<RCC>
+    <qresource prefix="/1">
+        <file>Res/res/blast1.gif</file>
+        <file>Res/res/blast2.gif</file>
+        <file>Res/res/blast3.gif</file>
+        <file>Res/res/blast4.gif</file>
+        <file>Res/res/blast5.gif</file>
+        <file>Res/res/blast6.gif</file>
+        <file>Res/res/blast7.gif</file>
+        <file>Res/res/blast8.gif</file>
+        <file>Res/res/enemy_tank_right.gif</file>
+        <file>Res/res/enemy_tank_right.jpg</file>
+        <file>Res/res/enemy_tank_up.gif</file>
+        <file>Res/res/enemy_tank_up.jpg</file>
+        <file>Res/res/gameover.jpg</file>
+        <file>Res/res/home.jpg</file>
+        <file>Res/res/illustrate.jpg</file>
+        <file>Res/res/logo.bmp</file>
+        <file>Res/res/p2tankD.gif</file>
+        <file>Res/res/p2tankL.gif</file>
+        <file>Res/res/p2tankR.gif</file>
+        <file>Res/res/p2tankU.gif</file>
+        <file>Res/res/tank_down.jpg</file>
+        <file>Res/res/tank_left.jpg</file>
+        <file>Res/res/tank_right.jpg</file>
+        <file>Res/res/tank_up.jpg</file>
+        <file>Res/res/wall1.jpg</file>
+        <file>Res/res/wall2.jpg</file>
+        <file>Res/res/score_back.png</file>
+        <file>Res/res/mainWindow.jpg</file>
+        <file>Res/res/login_back.jpg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>Res/res2/1player.png</file>
+        <file>Res/res2/2player.png</file>
+        <file>Res/res2/bomb.png</file>
+        <file>Res/res2/brick.png</file>
+        <file>Res/res2/down.jpg</file>
+        <file>Res/res2/food_boom.png</file>
+        <file>Res/res2/food_clock.png</file>
+        <file>Res/res2/food_gun.png</file>
+        <file>Res/res2/food_iron.png</file>
+        <file>Res/res2/food_protect.png</file>
+        <file>Res/res2/food_star.png</file>
+        <file>Res/res2/food_tank.png</file>
+        <file>Res/res2/gun.png</file>
+        <file>Res/res2/left.jpg</file>
+        <file>Res/res2/right.jpg</file>
+        <file>Res/res2/river1.png</file>
+        <file>Res/res2/river2.png</file>
+        <file>Res/res2/shield.png</file>
+        <file>Res/res2/snail.png</file>
+        <file>Res/res2/start.png</file>
+        <file>Res/res2/tree.png</file>
+        <file>Res/res2/up.jpg</file>
+    </qresource>
+    <qresource prefix="/3">
+        <file>Res/res3/back.tga</file>
+        <file>Res/res3/enemy_tank_down.jpg</file>
+        <file>Res/res3/enemy_tank_left.jpg</file>
+        <file>Res/res3/gameover.jpg</file>
+        <file>Res/res3/quit.tga</file>
+    </qresource>
+    <qresource prefix="/4">
+        <file>Res/res5/icon_bomb.png</file>
+        <file>Res/res5/playagain.png</file>
+    </qresource>
+    <qresource prefix="/5">
+        <file>Res/music/background.wav</file>
+        <file>Res/music/boom.wav</file>
+        <file>Res/music/buttonEnter.wav</file>
+    </qresource>
+    <qresource prefix="/login">
+        <file>Res/res6/qss/style-1.qss</file>
+        <file>Res/res6/qss/style-2.qss</file>
+        <file>Res/res6/qss/style-3.qss</file>
+        <file>Res/res6/qss/style-4.qss</file>
+        <file>Res/res6/pic/1.png</file>
+        <file>Res/res6/pic/2.png</file>
+        <file>Res/res6/pic/3.png</file>
+        <file>Res/res6/pic/4.png</file>
+        <file>Res/res6/pic/background-1.png</file>
+        <file>Res/res6/pic/background-2.png</file>
+        <file>Res/res6/pic/background-3.png</file>
+        <file>Res/res6/pic/background-4.png</file>
+        <file>Res/res6/pic/pwd.png</file>
+        <file>Res/res6/pic/user_name.png</file>
+    </qresource>
+</RCC>
