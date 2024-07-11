@@ -16,6 +16,7 @@ Tankfire直接从英文中取得，Tank指坦克，Fire指火炮，二者结合�
 
 ### 团队Logo：
 
+![2449ee09656b10cb95b8857d2bf6cd33](https://github.com/chantouRichard/Tank-fire/assets/143107804/84c05832-9cf3-47ab-9c90-4d242adb0868)
 
 
 **Logo寓意说明：**
