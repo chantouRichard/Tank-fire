@@ -1,43 +1,75 @@
 #include "level1.h"
+#include <QLabel>
+#include<QPixmap>
+#include<QPainter>
+
 #include<QKeyEvent>
 
 int level1map[Mapx_size][Mapy_size] = {
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
-    {2,1,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
-    {2,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
-    {2,1,1,0,0,0,1,1,1,1,0,0,0,0,1,0,0,0,0,2,2,2,2,2,2},
-    {2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2},
-    {2,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,1,2,2,2,2},
-    {2,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,1,2,2,2,2,2},
-    {2,0,0,1,1,1,0,0,0,1,0,0,0,0,0,0,1,0,0,1,2,2,2,2,2},
-    {2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,1,1,2,2,2},
-    {2,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,0,2,2,1,2,2,2},
-    {2,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,2,2,1,2,2,2},
-    {2,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,2,2,2},
-    {2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2},
-    {2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
+    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
+    {2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2},
+    {2,0,0,0,0,0,1,0,0,0,0,0,2,2,2,0,0,0,0,2},
+    {2,1,1,1,0,0,1,1,1,2,2,0,0,0,0,0,1,1,1,2},
+    {2,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,2},
+    {2,0,0,1,0,0,0,0,0,0,2,2,2,1,0,0,2,0,0,2},
+    {2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2},
+    {2,1,1,2,0,0,0,0,4,4,0,0,0,0,0,0,0,0,0,2},
+    {2,0,0,0,0,1,0,0,4,4,0,0,0,0,2,2,1,1,2,2},
+    {2,0,0,0,0,1,0,0,0,0,0,2,0,0,1,0,0,0,0,2},
+    {2,0,0,0,0,2,0,0,0,0,0,0,0,0,1,0,0,0,0,2},
+    {2,2,1,1,2,2,0,0,0,0,0,0,0,0,1,0,0,0,0,2},
+    {2,0,0,0,0,0,0,0,3,3,3,3,0,0,1,0,0,0,0,2},
+    {2,0,0,0,0,0,0,0,3,3,3,3,0,0,1,1,1,0,0,2},
+    {2,0,0,1,1,1,1,0,3,3,3,3,0,0,0,2,2,0,0,2},
+    {2,4,4,0,0,0,1,0,3,3,3,3,0,0,0,2,2,0,0,2},
+    {2,4,4,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,2},
+    {2,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,2},
+    {2,0,0,0,2,0,0,0,1,1,2,2,1,1,1,0,0,0,0,2},
+    {2,0,0,0,2,0,0,0,1,0,0,0,0,0,1,2,2,1,1,2},
+    {2,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,2},
+    {2,0,0,1,0,0,0,0,1,0,0,2,0,0,4,4,0,0,0,2},
+    {2,0,0,1,0,0,0,0,1,0,0,2,0,0,4,4,0,0,0,2},
+    {2,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,2},
+    {2,0,0,0,0,0,0,0,0,3,3,0,0,0,1,1,1,2,2,2},
+    {2,0,0,2,2,2,0,0,0,3,3,0,0,0,0,0,0,0,0,2},
+    {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
+    {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
 };
+
+
+
+int initenemyx1[3]={120,240,360};
+int initenemyy1[3]={120,120,120};
+int my_tankx1=60;
+int my_tanky1=60;
 
 level1::level1(QWidget *parent) : Level(parent)
 {
+    statusBar = new QLabel(this);
+    statusText = new QLabel(statusBar);
     Initmap();
+    Label1=new QLabel(this);
+    Label2=new QLabel(this);
+    Label3=new QLabel(this);
+    Label4=new QLabel(this);
+    Label5=new QLabel(this);
+
+    pixWall0=QPixmap(":/6/Res/res6/grass.jpg");
+    pixWall1=QPixmap(":/6/Res/res6/penzai1.jpg");
+    pixWall2=QPixmap(":/6/Res/res6/shitou1.png");
+    QPixmap pixWall3(":/6/Res/res6/bigzaocong.jpg");
+    QPixmap pixWall4(":/6/Res/res6/shuichi2.jpg");
+    p1=pixWall3.scaled(120, 120, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    p2=pixWall4.scaled(240, 240, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 void level1::Initmap(){
     loadMap(level1map);
-    initTank();
-    initEnemyTank();
+    resetTime();
+    score=0;
+    initTank(3,initenemyx1,initenemyy1,my_tankx1,my_tanky1);
+    initEnemyTank(3);
+    show_failpage_show=false;
 }
 
 void level1::keyPressEvent(QKeyEvent* event)
@@ -46,80 +78,43 @@ void level1::keyPressEvent(QKeyEvent* event)
 }
 
 void level1::paintEvent(QPaintEvent *event) {
-    Level::paintEvent(event);
-}
+    QPainter painter(this);
+    for (int i = 0; i < Mapx_size; ++i) {
+        for (int j = 0; j < Mapy_size; ++j) {
+            if (MAP_Global[i][j] == 0) {
+                painter.drawPixmap(i* 60, j * 60, 60, 60, pixWall0);
+            }
+            else  if (MAP_Global[i][j] == 1) {
+                painter.drawPixmap(i * 60, j * 60, 60, 60, pixWall1);
+            } else if (MAP_Global[i][j] == 2) {
+                painter.drawPixmap(i * 60, j * 60, 60, 60, pixWall2);
+            }
 
-void level1::initTank() {
-    my_tank=new Tank(60,60,this);
-    my_tank->showtank(this);
-    my_tank->Loadmap(map);
-    my_tank->addbudget();
-    for(int i=0;i<bulletsnumber;i++)
-    {
-    Bullet* it=&my_tank->bugdet[i];
-    connect(it,&Bullet::boom,this,&level1::updatemapforboom);
-}
-}
-void level1::Deletetank(){
-    my_tank->tank_img->hide();
-    enemy1->tank_img->hide();
-    enemy2->tank_img->hide();
-    enemy3->tank_img->hide();
-    delete my_tank;
-    delete enemy1;
-    delete enemy2;
-    delete enemy3;
-}
-void level1::initEnemyTank() {
-    enemy1=new EnemyTank(120,120,this);
-    enemy2=new EnemyTank(240,120,this);
-    enemy3=new EnemyTank(360,120,this);
-    enemy1->Loadmap(map);
-    enemy1->showTank(this);
-
-    enemy2->Loadmap(map);
-    enemy2->showTank(this);
-
-    enemy3->Loadmap(map);
-    enemy3->showTank(this);
-    for(int i=0;i<bulletsnumber;i++)
-    {
-    Bullet* it1=&enemy1->budget[i];
-    Bullet* it2=&enemy2->budget[i];
-    Bullet* it3=&enemy3->budget[i];
-    connect(it1,&Bullet::boom,this,&level1::updatemapforboom);
-    connect(it2,&Bullet::boom,this,&level1::updatemapforboom);
-    connect(it3,&Bullet::boom,this,&level1::updatemapforboom);
-    connect(my_tank,&Tank::move,it1,&enemybullet::updateenemy);
-    connect(my_tank,&Tank::move,it2,&enemybullet::updateenemy);
-    connect(my_tank,&Tank::move,it3,&enemybullet::updateenemy);
+        }
     }
+    Label1->move(900,60);
+    Label2->move(420,480);
+    Label3->move(720,480);
+    Label4->move(1440,540);
+    Label5->move(1260,840);
+    Label1->setFixedSize(120,120);
+    Label2->setFixedSize(120,120);
+    Label3->setFixedSize(240,240);
+    Label4->setFixedSize(120,120);
+    Label5->setFixedSize(120,120);
+
+
+
+    Label1->setPixmap(p1);
+    Label2->setPixmap(p1);
+    Label3->setPixmap(p2);
+    Label4->setPixmap(p1);
+    Label5->setPixmap(p1);
 }
 
 void level1::dead() {
     Level::dead();
 }
-void level1::updatemapforboom(int mapx,int mapy){
-    if(map[mapx][mapy]==1)
-    {
-        map[mapx][mapy]=0;
-    }
 
-    this->update();
-    my_tank->Loadmap(map);
-    enemy1->Loadmap(map);
-    enemy2->Loadmap(map);
-    enemy3->Loadmap(map);
-    for(int i=0;i<bulletsnumber;i++){
-        my_tank->bugdet[i].Loadmap(map);
-    }
-    for(int i=0;i<bulletsnumber;i++){
-        enemy1->budget[i].Loadmap(map);
-    }
-    for(int i=0;i<bulletsnumber;i++){
-        enemy2->budget[i].Loadmap(map);
-    }
-    for(int i=0;i<bulletsnumber;i++){
-        enemy3->budget[i].Loadmap(map);
-    }
-}
+
+
