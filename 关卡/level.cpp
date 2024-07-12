@@ -2,103 +2,34 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QBrush>
+#include <QLabel>
+#include<QMovie>
 #include <QPixmap>
-#include<QPaintEvent>
-#include<QRandomGenerator>
+#include <QPaintEvent>
 
 Level::Level(QWidget *parent)
     : QWidget(parent) ,score(0){
     statusBar = new QLabel(this);
     statusText = new QLabel(statusBar);
-    statusProp=new QLabel(statusBar);
-    Prop1=new QLabel(statusProp);
-    Prop2=new QLabel(statusProp);
-    Prop3=new QLabel(statusProp);
-    Prop1->resize(80,80);
-    Prop2->resize(80,80);
-    Prop3->resize(80,80);
-    Prop1->move(20,120);
-    Prop2->move(120,120);
-    Prop3->move(220,120);
-    for(int i=0;i<3;i++)
-    {
-        PropType[i]=0;
-    }
-    pixWall1=QPixmap(":/1/Res/res/wall1.jpg");
-    pixWall2=QPixmap(":/1/Res/res/wall2.jpg");
-    pixtool1=QPixmap(":/2/Res/res2/Heart.png");
-    pixtool2=QPixmap(":/2/Res/res2/Shield.png");
-    pixtool3=QPixmap(":/2/Res/res2/Attack.png");
-    pixtool4=QPixmap(":/2/Res/res2/Speed.png");
-    //道具栏的图标
-    QSize PropLabelSize(40,40);
-    pixColumnTool1=pixtool1;
-    pixColumnTool2=pixtool2;
-    pixColumnTool3=pixtool3;
-    pixColumnTool4=pixtool4;
-    pixColumnTool1 = pixColumnTool1.scaled(PropLabelSize, Qt::KeepAspectRatio);
-    pixColumnTool2 = pixColumnTool2.scaled(PropLabelSize, Qt::KeepAspectRatio);
-    pixColumnTool3 = pixColumnTool3.scaled(PropLabelSize, Qt::KeepAspectRatio);
-    pixColumnTool4 = pixColumnTool4.scaled(PropLabelSize, Qt::KeepAspectRatio);
     //通关界面
-    setFixedSize(2000, 1500);
+    setFixedSize(2000, 1200);
     setWindowTitle("tankfire");
     initColumn(statusBar,statusText);
     setupUI();
-    //增加的代码
-    show_failpage_show = false;
+    show_failpage_show=false;
 
-
-
-//    changeTimer->start(QRandomGenerator::global()->bounded(20000, 20001));
 }
 
 Level::~Level() {
     // 清理工作
 }
 
-void Level::initchangeTimer(){
-    changeTimer=new QTimer(this);
-    changeTimer->disconnect();
-    changeTimer->stop();
-    changeTimer->start(QRandomGenerator::global()->bounded(5000, 5500));
-    connect(changeTimer, &QTimer::timeout, this, &Level::onTimeout);
-}
-
-void Level::DeletechangTimer() {
-    if (changeTimer) {
-        if (changeTimer->isActive()){
-            changeTimer->disconnect();
-            changeTimer->stop();
-//        }
-        delete changeTimer;
-        changeTimer = nullptr; // 将指针设为 nullptr，以防后续访问无效指针
-    }
-}
-}
-// 在其他地方调用 DeletechangTimer 之前，进行检查
-
-
 void Level::keyReleaseEvent(QKeyEvent *event){
     my_tank->keyReleaseEvent(event);
 }
 
 void Level::setupUI() {
-    QPushButton *next = new QPushButton("Next level", this);
-    next->resize(150, 50);
-    next->move(675, 200);
 
-    QPushButton *backbutton = new QPushButton("Back", this);
-    backbutton->resize(100, 50);
-    backbutton->move(10, 10);
-
-    connect(backbutton, &QPushButton::clicked, [=]() {
-        emit this->back();
-    });
-
-    connect(next, &QPushButton::clicked, [=]() {
-        emit this->Win();
-    });
 }
 
 void Level::loadMap(int newMap[Mapx_size][Mapy_size]) {
@@ -111,7 +42,7 @@ void Level::loadMap(int newMap[Mapx_size][Mapy_size]) {
 
 void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
     // 初始化状态栏
-    statusBar->setGeometry(1680, 0, 320, 1500);
+    statusBar->setGeometry(1680, 0, 320, 1200);
     statusBar->setStyleSheet(
         "background-color: black;"
         "border: 10px solid #888888;"
@@ -120,7 +51,7 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
         "box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);"
     );
 
-    statusText->setGeometry(0, 0, 320, 500);
+    statusText->setGeometry(0, 0, 300, 800);
     statusText->setStyleSheet(
         "color: white;"
         "font-size: 40px;"
@@ -129,17 +60,6 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
         "text-align: center;"
     );
     statusText->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    //道具栏
-    statusProp->setGeometry(0,500,320,400);
-    statusProp->setStyleSheet(
-        "color: white;"
-        "font-size: 32px;"
-        "font-family: Comic Sans MS, sans-serif;"
-        "padding: 10px;"
-        "text-align: center;"
-    );
-    statusProp->setAlignment(Qt::AlignHCenter);
-    statusProp->setText("道具栏\n道具1  道具2  道具3\n\n\n\nU         I         O");
 
     // 初始化计时器
     timer = new QTimer(this);
@@ -158,7 +78,7 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
                 "font-family:Comic Sans MS;"
                 );
     next->resize(150, 70);
-    next->move(75, 1800);
+    next->move(75, 1000);
 
     backbutton = new QPushButton("back", statusBar);
     backbutton->setStyleSheet(
@@ -168,7 +88,27 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
                 "font-family:Comic Sans MS;"
                 );
     backbutton->resize(150, 70);
-    backbutton->move(75, 1300);
+    backbutton->move(75, 1000);
+
+    passButton = new QPushButton("Pass", statusBar);
+    passButton->setStyleSheet(
+                "color:white;"
+                "font-size: 40px;"
+                "padding: 10px;"
+                "font-family:Comic Sans MS;"
+                );
+    passButton->resize(150, 70);
+    passButton->move(75, 1800);
+
+    failButton=new QPushButton("Fail",statusBar);
+    failButton->setStyleSheet(
+                "color:white;"
+                "font-size: 40px;"
+                "padding: 10px;"
+                "font-family:Comic Sans MS;"
+                );
+    failButton->resize(150, 70);
+    failButton->move(75, 1800);
 
     backButWinbutton=new QPushButton("Back",statusBar);
     backButWinbutton->setStyleSheet(
@@ -180,7 +120,7 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
     backButWinbutton->resize(150, 70);
     backButWinbutton->move(75, 1800);
 
-    replay=new QPushButton("Replay",statusBar);
+    replay=new QPushButton("Replay",this);
     replay->setStyleSheet(
                 "color:white;"
                 "font-size: 40px;"
@@ -198,38 +138,17 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
         emit this->Win();
     });
 
+    connect(passButton, &QPushButton::clicked, this, &Level::passPageShow);
+
+    connect(failButton,&QPushButton::clicked,this,&Level::failPageShow);
+
     connect(backButWinbutton,&QPushButton::clicked,[=](){
         emit this->backButWin();
     });
-
-    connect(replay,&QPushButton::clicked,[=]{
-        emit this->Replay();
-    });
 }
 
-void Level::paintEvent(QPaintEvent *event) {
-    QPainter painter(this);
-    QBrush brush(Qt::black);
-
-
-
-    for (int i = 0; i < Mapx_size; ++i) {
-        for (int j = 0; j < Mapy_size; ++j) {
-            if (MAP_Global[j][i] == 1) {
-                painter.drawPixmap(j * 60, i * 60, 60, 60, pixWall1);
-            } else if (MAP_Global[j][i] == 2) {
-                painter.drawPixmap(j * 60, i * 60, 60, 60, pixWall2);
-            }
-            else if(MAP_Global[j][i]==20){painter.drawPixmap(j*60,i*60,60,60,pixtool1);}
-            else if(MAP_Global[j][i]==30){painter.drawPixmap(j*60,i*60,60,60,pixtool2);}
-            else if(MAP_Global[j][i]==40){painter.drawPixmap(j*60,i*60,60,60,pixtool3);}
-            else if(MAP_Global[j][i]==50){painter.drawPixmap(j*60,i*60,60,60,pixtool4);}
-        }
-    }
-}
 
 void Level::updateTime(QLabel* statusText) {
-
     QDateTime currentTime = QDateTime::currentDateTime();
     qint64 secondsPassed = startTime.secsTo(currentTime);
 
@@ -247,84 +166,10 @@ void Level::updateTime(QLabel* statusText) {
     passTime = secondsPassed;
 
     statusText->setText(text);
-
-    for(int i=0;i<3;i++)
-    {
-        if(i==0)
-        {
-            switch (PropType[i])
-            {
-            case 0:
-                Prop1->clear();
-                break;
-            case 20:
-                qDebug()<<"20";
-                Prop1->setPixmap(pixColumnTool1);
-                break;
-            case 30:
-                qDebug()<<"30";
-                Prop1->setPixmap(pixColumnTool2);
-                break;
-            case 40:
-                qDebug()<<"40";
-                Prop1->setPixmap(pixColumnTool3);
-                break;
-            case 50:
-                qDebug()<<"50";
-                Prop1->setPixmap(pixColumnTool4);
-                break;
-            }
-        }
-        if(i==1)
-        {
-            switch (PropType[i])
-            {
-            case 0:
-                Prop2->clear();
-                break;
-            case 20:
-                Prop2->setPixmap(pixColumnTool1);
-                break;
-            case 30:
-                Prop2->setPixmap(pixColumnTool2);
-                break;
-            case 40:
-                Prop2->setPixmap(pixColumnTool3);
-                break;
-            case 50:
-                Prop2->setPixmap(pixColumnTool4);
-                break;
-            }
-        }
-        if(i==2)
-        {
-            switch (PropType[i])
-            {
-            case 0:
-                Prop3->clear();
-                break;
-            case 20:
-                Prop3->setPixmap(pixColumnTool1);
-                break;
-            case 30:
-                Prop3->setPixmap(pixColumnTool2);
-                break;
-            case 40:
-                Prop3->setPixmap(pixColumnTool3);
-                break;
-            case 50:
-                Prop3->setPixmap(pixColumnTool4);
-                break;
-            }
-        }
-    }
-    update();
-
 }
 
 void Level::initTank(int enemy_num,int *enemysx,int *enemysy,int my_tankx,int my_tanky) {
     // 通用的初始化主坦克的逻辑
-
     this->enemy_num=enemy_num;
     enemy_x_site=new int[enemy_num];
     enemy_y_site=new int[enemy_num];
@@ -335,10 +180,6 @@ void Level::initTank(int enemy_num,int *enemysx,int *enemysy,int my_tankx,int my
     //初始化敌人位置
     my_tank=new Tank(my_tankx,my_tanky,this);
     my_tank->showtank(this);
-    connect(my_tank,&Tank::get_prop,this,&Level::HandleGetProp);
-    connect(my_tank,&Tank::use_prop,this,&Level::HandleKey);
-    qDebug()<<"YESYES";
-
     for(int i=0;i<bulletsnumber;i++)
     {
         Bullet* it=&my_tank->bugdet[i];
@@ -368,10 +209,10 @@ void Level::initEnemyTank(int enemy_num) {
             connect(bul,&enemybullet::boom,this,&Level::updatemapforboom);
             connect(my_tank,&Tank::my_tank_move,bul,&enemybullet::getenemysit);
             connect(bul,&enemybullet::kill_my_tank,[=](){
-                  my_tank->my_tank_live--;
-                  if(my_tank->my_tank_live<=0)show_failpage_show=true;
-                  if(show_failpage_show)
+                  my_tank->my_tank_live=false;
+                  if(!show_failpage_show)
                       failPageShow();
+                  show_failpage_show=true;
             });
         }
         connect(enemys[i],&EnemyTank::enemy_move,this,&Level::updateenemysit);
@@ -402,8 +243,6 @@ void Level::Deletetank(){
     }
     delete my_tank;
     delete[] enemys;
-
-
 }
 
 void Level::updateenemysit(){
@@ -440,14 +279,14 @@ void Level::clear_enemytank(int id){
 void Level::resetTime() {
     // 重置时间计数为0
     startTime = QDateTime::currentDateTime();
-    timer->start();
 }
 
 void Level::passPageShow() {
     timer->stop();
     //移动按钮
-    next->move(75, 1400);
-    backbutton->move(75,1800);
+    failButton->move(75,1800);
+    next->move(75, 900);
+    backbutton->move(75,1000);
     backButWinbutton->move(75,1300);
     //
     passPage = new QLabel(this); // 确保 passPage 是 QWidget 的实例
@@ -483,15 +322,16 @@ void Level::failPageShow()
 {
     timer->stop();
     //移动按钮
+    passButton->move(75,1800);
     replay->move(75,1400);
-    backbutton->move(75,1300);
+    backbutton->move(75,1000);
     //
     failPage = new QLabel(this);
     failPage->setGeometry(0, 0, 1500, 1500);
     failPage->setStyleSheet("background-color: white;");
     failPage->setVisible(true);
     failPage->setStyleSheet("background-color: white; color: red; font-size: 100px; font-family: Comic Sans MS;");
-    failPage->setText("YOU LOSE!");
+    failPage->setText("你输了，你是傻逼");
     failPage->setAlignment(Qt::AlignCenter);
 }
 
@@ -542,8 +382,7 @@ void Level::grade() {
 
 void Level::deletePassPage()
 {
-    backButWinbutton->move(75,1800);
-    backbutton->move(75,1300);
+    failButton->move(75,1100);
     next->move(75,1800);
     passPage->hide();
     ST1->hide();
@@ -554,134 +393,7 @@ void Level::deletePassPage()
 void Level::deleteFailPage()
 {
     next->move(75,1800);
+    passButton->move(75,1200);
     replay->move(75,1800);
     failPage->hide();
 }
-
-void Level::changeRandomZeroToOne() {
-    QVector<QPoint> zeroPositions;
-    for (int x = 0; x < Mapx_size; ++x) {
-        for (int y = 0; y < Mapy_size; ++y) {
-            if (MAP_Global[x][y] == 0) {
-                zeroPositions.append(QPoint(x, y));
-            }
-        }
-    }
-
-    if (!zeroPositions.isEmpty()) {
-        qDebug()<<"1";
-        int randomIndex = QRandomGenerator::global()->bounded(zeroPositions.size());
-        QPoint randomPoint = zeroPositions[randomIndex];
-        MAP_Global[randomPoint.x()][randomPoint.y()] = (rand()%4+2)*10;
-        update();
-    }
-}
-
-void Level::onTimeout() {
-    changeRandomZeroToOne();
-//    changeTimer->start(QRandomGenerator::global()->bounded(25000, 25001)); // 重新设置定时器
-}
-
-void Level::hide_all_tank(){
-    my_tank->tank_img->hide();
-    for(int i=0;i<bulletsnumber;i++){
-        my_tank->bugdet[i].BULA->hide();
-        my_tank->bugdet[i].BOOM->hide();
-        my_tank->bugdet[i].bigBOOM->hide();
-        my_tank->bugdet[i].BULA->move(-10,-10);
-    }
-    for(int i=0;i<enemy_num;i++)
-    {
-        enemys[i]->enemy_tank_img->hide();
-        enemys[i]->shootTimer->stop();
-        for(int j=0;j<bulletsnumber;j++){
-            enemys[i]->bullets[j].BULA->hide();
-            enemys[i]->bullets[j].BOOM->hide();
-            enemys[i]->bullets[j].bigBOOM->hide();
-            enemys[i]->bullets[j].BULA->move(-100,-100);
-            enemys[i]->bullets[j].enemyx=-200;
-            enemys[i]->bullets[j].enemyy=-200;
-        }
-
-    }
-}
-
-int Level::GetColumnIndex()
-{
-    for(int i=0;i<3;i++)
-    {
-        if(PropType[i]==0)return i;
-    }
-    return -1;
-}
-
-void Level::HandleGetProp(int id)
-{
-    qDebug()<<"Handle!!";
-    if(GetColumnIndex()!=-1)
-    {
-        PropType[GetColumnIndex()]=id;
-    }
-}
-
-void Level::HandleKey(int id)
-{
-    if(id==0)
-    {
-        switch (PropType[id])
-        {
-        case 20:
-            my_tank->addLife(1);
-            break;
-        case 30:
-            my_tank->shield();
-            break;
-        case 40:
-            my_tank->attack();
-            break;
-        case 50:
-            my_tank->speedUp();
-            break;
-        }
-        PropType[id]=0;
-    }
-    if(id==1)
-    {
-        switch (PropType[id])
-        {
-        case 20:
-            my_tank->addLife(1);
-            break;
-        case 30:
-            my_tank->shield();
-            break;
-        case 40:
-            my_tank->attack();
-            break;
-        case 50:
-            my_tank->speedUp();
-            break;
-        }
-        PropType[id]=0;
-    }
-    if(id==2)
-    {
-        switch (PropType[id])
-        {
-        case 20:
-            my_tank->addLife(1);
-            break;
-        case 30:
-            my_tank->shield();
-            break;
-        case 40:
-            my_tank->attack();
-            break;
-        case 50:
-            my_tank->speedUp();
-            break;
-        }
-        PropType[id]=0;
-    }
-}
-
