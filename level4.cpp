@@ -240,9 +240,11 @@ void level4::initEnemyTank(int enemy_num) {
     else if(Wave==2){
         enemys=new EnemyTank*[enemy_num];
         enemybullet* bul;
-
+        enemy_num=4;
         for(int i=0;i<enemy_num;i++)
         {
+            enemy_x_site[i]=240+120*i;
+            enemy_y_site[i]=60;
             enemys[i]=new EnemyTank(enemy_x_site[i],enemy_y_site[i],my_tank,this);
             if(i==1){
                 enemys[1]->enemytank_style=2;
@@ -272,7 +274,7 @@ void level4::initEnemyTank(int enemy_num) {
         emit my_tank->my_tank_move(my_tank->tankx,my_tank->tanky);
 
 
-        frosttank=new frostenemy1(120,120,my_tank,this);
+        frosttank=new frostenemy1(120,60,my_tank,this);
         frostbullet* buf;
         frosttank->showTank(this);
         updateenemysit();
@@ -305,9 +307,11 @@ void level4::initEnemyTank(int enemy_num) {
     else if(Wave==3){
         enemys=new EnemyTank*[enemy_num];
         enemybullet* bul;
-
+        enemy_num=5;
         for(int i=0;i<enemy_num;i++)
         {
+            enemy_x_site[i]=240+120*i;
+            enemy_y_site[i]=60;
             enemys[i]=new EnemyTank(enemy_x_site[i],enemy_y_site[i],my_tank,this);
             if(i==1){
                 enemys[1]->enemytank_style=2;
@@ -337,7 +341,7 @@ void level4::initEnemyTank(int enemy_num) {
         emit my_tank->my_tank_move(my_tank->tankx,my_tank->tanky);
 
 
-        fire_tank=new firetank(120,120,my_tank,this);
+        fire_tank=new firetank(120,60,my_tank,this);
         firebullet* buf;
         fire_tank->showTank(this);
         for(int j=0;j<bulletsnumber;j++)
