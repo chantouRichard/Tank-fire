@@ -63,6 +63,12 @@ LoginWindow::LoginWindow(QWidget *parent) : QWidget(parent)
     passwordEdit->setEchoMode(QLineEdit::Password); // 输入加密
     passwordEdit->setStyleSheet("color: black; font-size: 24px;"); // 设置字体颜色为黑色
 
+    usernameEdit->setAccessibleName("账户");
+    usernameEdit->setAccessibleDescription("input username");
+
+    passwordEdit->setAccessibleName("密码");
+    passwordEdit->setAccessibleDescription("input password");
+
     int fontId1 = QFontDatabase::addApplicationFont(Iron);
     QString fontFamily1 = QFontDatabase::applicationFontFamilies(fontId1).at(0);
     QFont customFont1(fontFamily1, 12);
@@ -87,25 +93,21 @@ LoginWindow::LoginWindow(QWidget *parent) : QWidget(parent)
     usernameEdit->setMinimumSize(500, 70);
     passwordEdit->setMinimumSize(500, 70);
 
+    //设置按钮音效
+    loginButton->installEventFilter(this);
+    registerButton->installEventFilter(this);
+
     // 将标题加入布局
     mainLayout->addWidget(titleLabel, 0, Qt::AlignHCenter);
 
     // 将标签和输入框加入布局
     QHBoxLayout* userLayout = new QHBoxLayout;
     userLayout->addSpacing(30); // 调整图像和输入行之间的间隔
-    QLabel* userIcon = new QLabel(this);
-    userIcon->setPixmap(QPixmap(":/login/Res/res6/pic/user_name.png").scaled(58, 58, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    userIcon->setStyleSheet("background-color: transparent;"); // 背景设置为完全透明
-    userLayout->addWidget(userIcon);
     userLayout->addWidget(usernameEdit);
     mainLayout->addLayout(userLayout);
 
     QHBoxLayout* pwdLayout = new QHBoxLayout;
     pwdLayout->addSpacing(30); // 调整图像和输入行之间的间隔
-    QLabel* pwdIcon = new QLabel(this);
-    pwdIcon->setPixmap(QPixmap(":/login/Res/res6/pic/pwd.png").scaled(58, 58, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    pwdIcon->setStyleSheet("background-color: transparent;"); // 背景设置为完全透明
-    pwdLayout->addWidget(pwdIcon);
     pwdLayout->addWidget(passwordEdit);
     mainLayout->addLayout(pwdLayout);
 
@@ -200,7 +202,7 @@ void LoginWindow::on_reginButton_clicked()
 
     QString runPath = QCoreApplication::applicationDirPath() + filename;
     runPath.replace(QString("/"), QString("\\"));
-    qDebug() << runPath;
+//    qDebug() << runPath;
 
     QFile file1(runPath);
     if (!file1.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -238,4 +240,14 @@ void LoginWindow::on_reginButton_clicked()
 void LoginWindow::showMessageSnackbar(const QString &message)
 {
     messageSnackbar->addMessage(message);
+}
+
+bool LoginWindow::eventFilter(QObject *obj, QEvent *event)
+{
+     if (event->type() == QEvent::Enter)
+     {
+         player_enterButton->setPosition(0); // 将音效位置设置为开头，以便从头播放
+         player_enterButton->play();
+     }
+     return QObject::eventFilter(obj, event);
 }

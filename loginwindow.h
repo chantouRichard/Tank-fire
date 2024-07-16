@@ -41,6 +41,7 @@ private:
     QTimer* timer;
     void showMessageSnackbar(const QString &message);
     bool checkLogin(const QString& username, const QString& password);
+    bool eventFilter(QObject *obj, QEvent *event);
     void centerCanvas();
 };
 

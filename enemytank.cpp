@@ -9,7 +9,6 @@
 #include <QWidget>
 #include<QTimer>
 #include<QLabel>
-#include<QDebug>
 
 Box::Box(int x,int y,Box* pre)
 {
@@ -28,14 +27,14 @@ EnemyTank::EnemyTank(int startX, int startY, Tank*& my_tank,QWidget* parent)
     enemy_tank_img->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     live=1;
     enemytank_style=1;
-    enemy_HP=1;
+    enemy_HP=2;
     shootTimer = new QTimer(this);
 }
 
 void EnemyTank::showTank(QWidget*pa)
 {
     if(enemytank_style==1){
-        enemy_HP=1;
+        enemy_HP=2;
     }
     else if(enemytank_style==2){
         enemy_HP=5;
@@ -43,15 +42,15 @@ void EnemyTank::showTank(QWidget*pa)
     enemy_tank_img->setParent(pa);
     if(enemytank_style==1)
     {
-    Enemy_Tank.load(":/2/Res/res2/up.jpg");
-    enemy_tank_img->setPixmap(Enemy_Tank);
-    enemy_tank_img->move(currentX,currentY);
-    //设置坦克图片始终在顶部
-    enemy_tank_img->show();
-    enemy_tank_img->setWindowFlags(enemy_tank_img->windowFlags() | Qt::WindowStaysOnTopHint);
+        Enemy_Tank.load(Enemy1TankUp);
+        enemy_tank_img->setPixmap(Enemy_Tank);
+        enemy_tank_img->move(currentX,currentY);
+        //设置坦克图片始终在顶部
+        enemy_tank_img->show();
+        enemy_tank_img->setWindowFlags(enemy_tank_img->windowFlags() | Qt::WindowStaysOnTopHint);
     }
     else if(enemytank_style==2){
-        Enemy_Tank.load(":/1/Res/res/tank_up.jpg");
+        Enemy_Tank.load(Enemy2TankUp);
         QPixmap scaledPixmap = Enemy_Tank.scaled(60,60, Qt::KeepAspectRatio, Qt::FastTransformation);
         enemy_tank_img->setPixmap(scaledPixmap);
         enemy_tank_img->move(currentX,currentY);
@@ -60,7 +59,7 @@ void EnemyTank::showTank(QWidget*pa)
         enemy_tank_img->setWindowFlags(enemy_tank_img->windowFlags() | Qt::WindowStaysOnTopHint);
     }
     moveTimer = new QTimer(this);
-    moveTimer->start(50); // 每50毫秒更新一次位置
+    moveTimer->start(50);
     connect(moveTimer, &QTimer::timeout, this, &EnemyTank::updatePosition);
 
     pauseTimer = new QTimer(this);
@@ -86,12 +85,12 @@ void EnemyTank::updatePosition() {
         if (!irremovable()) currentY -= stepSize;
         if(enemytank_style==1)
         {
-            Enemy_Tank.load(":/2/Res/res2/up.jpg");
+            Enemy_Tank.load(Enemy1TankUp);
             enemy_tank_img->setPixmap(Enemy_Tank);
         }
         else if(enemytank_style==2)
         {
-            Enemy_Tank.load(":/1/Res/res/tank_up.jpg");
+            Enemy_Tank.load(Enemy2TankUp);
             QPixmap scaledPixmap = Enemy_Tank.scaled(60,60, Qt::KeepAspectRatio, Qt::FastTransformation);
             enemy_tank_img->setPixmap(scaledPixmap);
         }
@@ -100,11 +99,11 @@ void EnemyTank::updatePosition() {
     case 90: // Right
         if (!irremovable()) currentX += stepSize;
         if(enemytank_style==1){
-            Enemy_Tank.load(":/2/Res/res2/right.jpg");
+            Enemy_Tank.load(Enemy1TankRight);
             enemy_tank_img->setPixmap(Enemy_Tank);
         }
         else if(enemytank_style==2){
-            Enemy_Tank.load(":/1/Res/res/tank_right.jpg");
+            Enemy_Tank.load(Enemy2TankRight);
             QPixmap scaledPixmap = Enemy_Tank.scaled(60,60, Qt::KeepAspectRatio, Qt::FastTransformation);
             enemy_tank_img->setPixmap(scaledPixmap);
         }
@@ -113,11 +112,11 @@ void EnemyTank::updatePosition() {
     case 180: // Down
         if (!irremovable()) currentY += stepSize;
         if(enemytank_style==1){
-            Enemy_Tank.load(":/2/Res/res2/down.jpg");
+            Enemy_Tank.load(Enemy1TankDown);
             enemy_tank_img->setPixmap(Enemy_Tank);
         }
         else if(enemytank_style==2){
-            Enemy_Tank.load(":/1/Res/res/tank_down.jpg");
+            Enemy_Tank.load(Enemy2TankDown);
             QPixmap scaledPixmap = Enemy_Tank.scaled(60,60, Qt::KeepAspectRatio, Qt::FastTransformation);
             enemy_tank_img->setPixmap(scaledPixmap);
         }
@@ -126,11 +125,11 @@ void EnemyTank::updatePosition() {
     case 270: // Left
         if (!irremovable()) currentX -= stepSize;
         if(enemytank_style==1){
-            Enemy_Tank.load(":/2/Res/res2/left.jpg");
+            Enemy_Tank.load(Enemy1TankLeft);
             enemy_tank_img->setPixmap(Enemy_Tank);
         }
         else if(enemytank_style==2){
-            Enemy_Tank.load(":/1/Res/res/tank_left.jpg");
+            Enemy_Tank.load(Enemy2TankLeft);
             QPixmap scaledPixmap = Enemy_Tank.scaled(60,60, Qt::KeepAspectRatio, Qt::FastTransformation);
             enemy_tank_img->setPixmap(scaledPixmap);
         }
@@ -187,7 +186,7 @@ void EnemyTank::getDire_BFS(int sx, int sy, int ex, int ey, QVector<QVector<bool
     Box* box = new Box(sx, sy, nullptr);
     qu.push_back(box);
     record.push_back(box);
-    visited[sx][sy] = true;
+    visited[sy][sx] = true;
     int curx, cury, tempx, tempy;
 
     while (!qu.empty()) {
@@ -204,11 +203,11 @@ void EnemyTank::getDire_BFS(int sx, int sy, int ex, int ey, QVector<QVector<bool
             tempx = curx + dx[i];
             tempy = cury + dy[i];
 
-            if (tempx >= 0 && tempx < Mapx_size && tempy >= 0 && tempy < Mapy_size && MAP_Global[tempx][tempy] == 0 && !visited[tempx][tempy]) {
+            if (tempx >= 0 && tempx < Mapx_size && tempy >= 0 && tempy < Mapy_size && MAP_Global[tempy][tempx] %10 == 0 && !visited[tempy][tempx]) {
                 Box* addbox = new Box(tempx, tempy, box);
                 qu.push_back(addbox);
                 record.push_back(addbox);
-                visited[tempx][tempy] = true;
+                visited[tempy][tempx] = true;
             }
         }
     }
@@ -285,40 +284,40 @@ bool EnemyTank::irremovable() {
     currentY=enemy_tank_img->pos().y();
     updatemapsit();
     bool check1=1;bool check2=1;bool check3=1;bool check4=1;bool check5=1,check6=1,check7=1,check8=1,check9=1,check10=1,check11=1,check12=1;
-    if(MAP_Global[map_enemy_tankx1][map_enemy_tanky1-1]==4||MAP_Global[map_enemy_tankx1][map_enemy_tanky1-1]==0||MAP_Global[map_enemy_tankx1][map_enemy_tanky1-1]>10){
+    if(MAP_Global[map_enemy_tanky1-1][map_enemy_tankx1]==0||MAP_Global[map_enemy_tanky1-1][map_enemy_tankx1]>10){
         check1=0;
     }
-    if(MAP_Global[map_enemy_tankx2][map_enemy_tanky2-1]==4||MAP_Global[map_enemy_tankx2][map_enemy_tanky2-1]==0||MAP_Global[map_enemy_tankx2][map_enemy_tanky2-1]>10){
+    if(MAP_Global[map_enemy_tanky2-1][map_enemy_tankx2]==0||MAP_Global[map_enemy_tanky2-1][map_enemy_tankx2]>10){
         check2=0;
     }
-    if(MAP_Global[map_enemy_tankx1][map_enemy_tanky1+1]==4||MAP_Global[map_enemy_tankx1][map_enemy_tanky1+1]==0||MAP_Global[map_enemy_tankx1][map_enemy_tanky1+1]>10){
+    if(MAP_Global[map_enemy_tanky1+1][map_enemy_tankx1]==0||MAP_Global[map_enemy_tanky1+1][map_enemy_tankx1]>10){
         check3=0;
     }
-    if(MAP_Global[map_enemy_tankx2][map_enemy_tanky2+1]==4||MAP_Global[map_enemy_tankx2][map_enemy_tanky2+1]==0||MAP_Global[map_enemy_tankx2][map_enemy_tanky2+1]>10){
+    if(MAP_Global[map_enemy_tanky2+1][map_enemy_tankx2]==0||MAP_Global[map_enemy_tanky2+1][map_enemy_tankx2]>10){
         check4=0;
     }
-    if(MAP_Global[map_enemy_tankx1-1][map_enemy_tanky1]==4||MAP_Global[map_enemy_tankx1-1][map_enemy_tanky1]==0||MAP_Global[map_enemy_tankx1-1][map_enemy_tanky1]>10){
+    if(MAP_Global[map_enemy_tanky1][map_enemy_tankx1-1]==0||MAP_Global[map_enemy_tanky1][map_enemy_tankx1-1]>10){
         check5=0;
     }
-    if(MAP_Global[map_enemy_tankx4-1][map_enemy_tanky4]==4||MAP_Global[map_enemy_tankx4-1][map_enemy_tanky4]==0||MAP_Global[map_enemy_tankx4-1][map_enemy_tanky4]>10){
+    if(MAP_Global[map_enemy_tanky4][map_enemy_tankx4-1]==0||MAP_Global[map_enemy_tanky4][map_enemy_tankx4-1]>10){
         check6=0;
     }
-    if(MAP_Global[map_enemy_tankx1+1][map_enemy_tanky1]==4||MAP_Global[map_enemy_tankx1+1][map_enemy_tanky1]==0||MAP_Global[map_enemy_tankx1+1][map_enemy_tanky1]>10){
+    if(MAP_Global[map_enemy_tanky1][map_enemy_tankx1+1]==0||MAP_Global[map_enemy_tanky1][map_enemy_tankx1+1]>10){
         check7=0;
     }
-    if(MAP_Global[map_enemy_tankx4+1][map_enemy_tanky4]==4||MAP_Global[map_enemy_tankx4+1][map_enemy_tanky4]==0||MAP_Global[map_enemy_tankx4+1][map_enemy_tanky4]>10){
+    if(MAP_Global[map_enemy_tanky4][map_enemy_tankx4+1]==0||MAP_Global[map_enemy_tanky4][map_enemy_tankx4+1]>10){
         check8=0;
     }
-    if(MAP_Global[map_enemy_tankx1][map_enemy_tanky1]==4||MAP_Global[map_enemy_tankx1][map_enemy_tanky1]==0||MAP_Global[map_enemy_tankx1][map_enemy_tanky1]>10){
+    if(MAP_Global[map_enemy_tanky1][map_enemy_tankx1]==0||MAP_Global[map_enemy_tanky1][map_enemy_tankx1]>10){
         check9=0;
     }
-    if(MAP_Global[map_enemy_tankx2][map_enemy_tanky2]==4||MAP_Global[map_enemy_tankx2][map_enemy_tanky2]==0||MAP_Global[map_enemy_tankx2][map_enemy_tanky2]>10){
+    if(MAP_Global[map_enemy_tanky2][map_enemy_tankx2]==0||MAP_Global[map_enemy_tanky2][map_enemy_tankx2]>10){
         check10=0;
     }
-    if(MAP_Global[map_enemy_tankx3][map_enemy_tanky3]==4||MAP_Global[map_enemy_tankx3][map_enemy_tanky3]==0||MAP_Global[map_enemy_tankx3][map_enemy_tanky3]>10){
+    if(MAP_Global[map_enemy_tanky3][map_enemy_tankx3]==0||MAP_Global[map_enemy_tanky3][map_enemy_tankx3]>10){
         check11=0;
     }
-    if(MAP_Global[map_enemy_tankx4][map_enemy_tanky4]==4||MAP_Global[map_enemy_tankx4][map_enemy_tanky4]==0||MAP_Global[map_enemy_tankx4][map_enemy_tanky4]>10){
+    if(MAP_Global[map_enemy_tanky4][map_enemy_tankx4]==0||MAP_Global[map_enemy_tanky4][map_enemy_tankx4]>10){
         check12=0;
     }
     if (currentX % 60 == 0 || currentY % 60 == 0) {
@@ -395,17 +394,14 @@ void EnemyTank::shoot(){
     }
 }
 
-void  EnemyTank::startshoottime(){
-    shootTimer->start(500);
+void  EnemyTank::startshoottime(int inter){
+    shootTimer->start(inter);
     connect(shootTimer,&QTimer::timeout,this,&EnemyTank::shoot);
 }
 
-
 void EnemyTank::Deletebullets(){
     for(int i=0;i<bulletsnumber;i++){
-        bullets[i].hide();
+        bullets[i].BULA->hide();
         bullets[i].BOOM->hide();
-        bullets[i].bigBOOM->hide();
     }
 }
-

@@ -8,6 +8,7 @@
 #include <QTransform>
 #include <QTimer>
 #include <QtDebug>
+#include <QMovie>
 class Bullet : public QWidget
 {
     Q_OBJECT
@@ -29,12 +30,11 @@ public:
     QTimer *bullettimer;
     QPixmap BULL;
     QLabel *BULA;
-    QPixmap Boom;
-    QPixmap Bigboom;
+    QMovie *boomvideo;
+
     QLabel *BOOM;
-    QLabel *bigBOOM;
+
     QTimer *boomtimer;
-    QTimer *bigboomtimer;
     void getenemysit(int*& x,int*& y);
     void stoptimer();
     void movebullet(QWidget* parent,int style,int x,int y);//发射子弹的移动

@@ -5,6 +5,8 @@
 #include <QPalette>
 #include <QPixmap>
 #include<QFontDatabase>
+#include <QFile>
+#include <QTextStream>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -24,32 +26,44 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // 创建开始游戏按钮
     startGameButton = new QtMaterialFlatButton("开始游戏", this);
-    startGameButton->setGeometry(270, 450, 350, 55); // 设置按钮位置和大小
+    startGameButton->setGeometry(250, 400, 350, 75); // 设置按钮位置和大小
     setButtonStyle(startGameButton, is_login);
 
     // 创建设置按钮
     setGameButton = new QtMaterialFlatButton("设置", this);
-    setGameButton->setGeometry(270, 570, 350, 55); // 设置按钮位置和大小
+    setGameButton->setGeometry(250, 520, 350, 75); // 设置按钮位置和大小
     setButtonStyle(setGameButton, is_login);
 
     // 创建登录按钮
     loginButton = new QtMaterialFlatButton("登录", this);
-    loginButton->setGeometry(270, 690, 350, 55); // 设置按钮位置和大小
+    loginButton->setGeometry(250, 640, 350, 75); // 设置按钮位置和大小
     setButtonStyle(loginButton, !is_login);
 
     // 创建历史分数按钮
     historyScoresButton = new QtMaterialFlatButton("历史分数", this);
-    historyScoresButton->setGeometry(270, 810, 350, 55); // 设置按钮位置和大小
+    historyScoresButton->setGeometry(250, 760, 350, 75); // 设置按钮位置和大小
     setButtonStyle(historyScoresButton, is_login);
 
     // 设置背景音乐
-    player_background->setMedia(QUrl("qrc:/5/Res/music/background.wav"));
-    player_background->setVolume(gameVolume);
-    player_background->play();
-    connect(player_background, &QMediaPlayer::stateChanged, player_background, &QMediaPlayer::play);
+    player_start->setMedia(QUrl(start_wav));
+    player_start->setVolume(gameVolume);
+    player_start->play();
+    is_play=true;
+    connect(player_start, &QMediaPlayer::stateChanged, player_start, [=](){
+        if(/*player_start->mediaStatus()==QMediaPlayer::EndOfMedia&&*/is_play)
+            player_start->play();
+        else
+        {
+            is_main_music_play=true;
+            player_background->play();
+            player_start->setPosition(0);
+            player_start->pause();
+        }
+    });
+
     //设置进入按钮的音乐
-    player_enterButton->setMedia(QUrl("qrc:/5/Res/music/buttonEnter.wav"));
-    player_enterButton->setVolume(100);
+    player_enterButton->setMedia(QUrl(button_wav));
+    player_enterButton->setVolume(buttonVolume);
 
     // 设置按钮事件过滤器
     startGameButton->installEventFilter(this);
@@ -79,11 +93,10 @@ void MainWindow::setButtonStyle(QtMaterialFlatButton* button, bool enabled)
 {
     int fontId = QFontDatabase::addApplicationFont(Titleround);
     QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
-    QFont customFont(fontFamily, 16);
+    QFont customFont(fontFamily, 26);
     customFont.setBold(true);
     button->setFont(customFont);
     button->setRippleStyle(Material::CenteredRipple);
-    button->setFontSize(20); // 设置字体大小
     button->setForegroundColor(QColor("#FFFFFF")); // 设置字体颜色为白色
     button->setCornerRadius(12); // 设置圆角
     button->setHaloVisible(true);
@@ -130,7 +143,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             {
                 if (button->isEnabled())
                 {
-                    qDebug() << "enter button";
                     player_enterButton->setPosition(0); // 将音效位置设置为开头，以便从头播放
                     player_enterButton->play();
                 }
@@ -155,6 +167,10 @@ void MainWindow::do_connect()
 
     connect(pass_window->backbtn, &QPushButton::clicked, this, [=]() {
         pass_window->hide();
+        QString scoreFilename = QCoreApplication::applicationDirPath() + score_filename; // 修改为实际的文件路径
+        scoreFilename.replace(QString("/"), QString("\\"));
+        pass_window->modifyScore(scoreFilename);
+        His_scory_window->loadScoresFromFile(scoreFilename);
         this->show();
     });
 
@@ -182,5 +198,18 @@ void MainWindow::do_connect()
     connect(His_scory_window->returnButton, &QPushButton::clicked, this, [=]() {
         this->show();
         His_scory_window->hide();
+    });
+
+    connect(startGameButton,&QPushButton::clicked,player_start,[=](){
+        is_play=false;
+        player_start->setPosition(0);
+        player_start->pause();
+    });
+
+    connect(pass_window->backbtn,&transimplebutton::clicked,player_start,[=](){
+        is_play=true;
+        is_main_music_play=false;
+        player_background->pause();
+        player_start->play();
     });
 }

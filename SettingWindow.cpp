@@ -104,6 +104,8 @@ SettingWindow::SettingWindow(QWidget *parent)
     returnButton->setRadius(30);
     returnButton->setFont(customFont);
     connect(returnButton, &QPushButton::clicked, this, &SettingWindow::handleReturn);
+
+    returnButton->installEventFilter(this);
 }
 
 QWidget* SettingWindow::createKeySettingsPage()
@@ -134,10 +136,16 @@ QWidget* SettingWindow::createKeySettingsPage()
     KeyLeftButton = new QtMaterialRaisedButton("左: A", page);
     KeyRightButton = new QtMaterialRaisedButton("右: D", page);
     KeyShootButton = new QtMaterialRaisedButton("射击: J", page);
-    KeyProp1Button = new QtMaterialRaisedButton("第一个道具: " + QKeySequence(KeyProp1).toString(), page);
-    KeyProp2Button = new QtMaterialRaisedButton("第二个道具: " + QKeySequence(KeyProp2).toString(), page);
-    KeyProp3Button = new QtMaterialRaisedButton("第三个道具: " + QKeySequence(KeyProp3).toString(), page);
-    KeyProp4Button = new QtMaterialRaisedButton("第四个道具: " + QKeySequence(KeyProp4).toString(), page);
+    KeyProp1Button = new QtMaterialRaisedButton("道具一: " + QKeySequence(KeyProp1).toString(), page);
+    KeyProp2Button = new QtMaterialRaisedButton("道具二: " + QKeySequence(KeyProp2).toString(), page);
+    KeyProp3Button = new QtMaterialRaisedButton("道具三: " + QKeySequence(KeyProp3).toString(), page);
+    KeyProp4Button = new QtMaterialRaisedButton("道具四: " + QKeySequence(KeyProp4).toString(), page);
+
+//    KeyUp=Qt::Key_W;
+//    KeyDown=Qt::Key_S;
+//    KeyLeft=Qt::Key_A;
+//    KeyRight=Qt::Key_D;
+//    KeyShoot=Qt::Key_J;
 
     setupButton(KeyUpButton);
     setupButton(keyDownButton);
@@ -165,12 +173,44 @@ QWidget* SettingWindow::createKeySettingsPage()
     KeyLeftButton->raise();
     KeyRightButton->raise();
     KeyShootButton->raise();
+    KeyProp1Button->raise();
+    KeyProp2Button->raise();
+    KeyProp3Button->raise();
+    KeyProp4Button->raise();
 
     connect(KeyUpButton, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
     connect(keyDownButton, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
     connect(KeyLeftButton, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
     connect(KeyRightButton, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
     connect(KeyShootButton, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
+    connect(KeyProp1Button, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
+    connect(KeyProp2Button, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
+    connect(KeyProp3Button, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
+    connect(KeyProp4Button, &QtMaterialFlatButton::clicked, this, &SettingWindow::handleKeyChange);
+
+    KeyUpButton->installEventFilter(this);
+    keyDownButton->installEventFilter(this);
+    KeyLeftButton->installEventFilter(this);
+    KeyRightButton->installEventFilter(this);
+    KeyShootButton->installEventFilter(this);
+    KeyProp1Button->installEventFilter(this);
+    KeyProp2Button->installEventFilter(this);
+    KeyProp3Button->installEventFilter(this);
+    KeyProp4Button->installEventFilter(this);
+
+    // 初始化消息对话框
+    int fontId1 = QFontDatabase::addApplicationFont(Iron);
+    QString fontFamily1 = QFontDatabase::applicationFontFamilies(fontId1).at(0);
+    QFont customFont1(fontFamily1, 12);
+
+    messageSnackbar = new QtMaterialSnackbar(page);
+    messageSnackbar->setBackgroundColor(QColor(232,230,240)); // 设置背景颜色
+    messageSnackbar->setTextColor(QColor(58,46,121)); // 设置文字颜色
+    messageSnackbar->setBackgroundOpacity(0.8); // 设置背景透明度
+    messageSnackbar->setFont(customFont1); // 设置字体大小
+    messageSnackbar->setBoxWidth(1000); // 设置Snackbar的宽度
+    messageSnackbar->setAutoHideDuration(3000); // 自动隐藏持续时间
+    messageSnackbar->setClickToDismissMode(true); // 点击外部隐藏
 
     page->show();
     return page;
@@ -180,41 +220,53 @@ QWidget* SettingWindow::createVolumeSettingsPage()
 {
     QWidget *page = new QWidget(this);
 
-    main_volumeLabel = new QLabel(page);
-    setupVolumeLabel(main_volumeLabel, "主音量");
-    main_volumeLabel->setGeometry(40, 30, 250, 75);
+//    gameVolume=50;
+//    buttonVolume=50;
+//    propVolume=50;
+//    boomVolume=50;
+//    victoryVolume=50;
+//    failVolume=50;
+//    startVolume=50;
+
+    start_volumeLabel = new QLabel(page);
+    setupVolumeLabel(start_volumeLabel, QString("主音量: %2").arg(startVolume));
+    start_volumeLabel->setGeometry(40, 60, 250, 75);
 
     button_volumeLabel = new QLabel(page);
-    setupVolumeLabel(button_volumeLabel, "按钮音量");
-    button_volumeLabel->setGeometry(40, 230, 250, 75);
+    setupVolumeLabel(button_volumeLabel, QString("按钮音量: %2").arg(buttonVolume));
+    button_volumeLabel->setGeometry(40, 310, 250, 75);
 
     boom_volumeLabel = new QLabel(page);
-    setupVolumeLabel(boom_volumeLabel, "爆炸音量");
-    boom_volumeLabel->setGeometry(40, 430, 250, 75);
+    setupVolumeLabel(boom_volumeLabel, QString("爆炸音量: %2").arg(boomVolume));
+    boom_volumeLabel->setGeometry(40, 560, 250, 75);
 
     victory_volumeLabel = new QLabel(page);
-    setupVolumeLabel(victory_volumeLabel, "胜利音量");
+    setupVolumeLabel(victory_volumeLabel, QString("胜利音量: %2").arg(victoryVolume));
     victory_volumeLabel->setGeometry(640, 30, 250, 75);
 
     fail_volumeLabel = new QLabel(page);
-    setupVolumeLabel(fail_volumeLabel, "失败音量");
+    setupVolumeLabel(fail_volumeLabel, QString("失败音量: %2").arg(failVolume));
     fail_volumeLabel->setGeometry(640, 230, 250, 75);
 
     prop_volumeLabel = new QLabel(page);
-    setupVolumeLabel(prop_volumeLabel, "道具音量");
+    setupVolumeLabel(prop_volumeLabel, QString("道具音量: %2").arg(propVolume));
     prop_volumeLabel->setGeometry(640, 430, 250, 75);
 
-    QtMaterialSlider *main_volumeSlider = new QtMaterialSlider(page);
-    setupSlider(main_volumeSlider, gameVolume);
-    setSlide(main_volumeSlider, 40, 120, 400, 40);
+    main_volumeLabel = new QLabel(page);
+    setupVolumeLabel(main_volumeLabel, QString("游戏音量: %2").arg(gameVolume));
+    main_volumeLabel->setGeometry(640, 630, 250, 75);
+
+    QtMaterialSlider *start_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(start_volumeSlider, startVolume);
+    setSlide(start_volumeSlider, 40, 150, 400, 40);
 
     QtMaterialSlider *button_volumeSlider = new QtMaterialSlider(page);
-    setupSlider(button_volumeSlider, buttonVolumn);
-    setSlide(button_volumeSlider, 40, 320, 400, 50);
+    setupSlider(button_volumeSlider, buttonVolume);
+    setSlide(button_volumeSlider, 40, 400, 400, 50);
 
     QtMaterialSlider *boom_volumeSlider = new QtMaterialSlider(page);
-    setupSlider(boom_volumeSlider, boomVolumn);
-    setSlide(boom_volumeSlider, 40, 520, 400, 50);
+    setupSlider(boom_volumeSlider, boomVolume);
+    setSlide(boom_volumeSlider, 40, 640, 400, 50);
 
     QtMaterialSlider *victory_volumeSlider = new QtMaterialSlider(page);
     setupSlider(victory_volumeSlider, victoryVolume);
@@ -228,12 +280,17 @@ QWidget* SettingWindow::createVolumeSettingsPage()
     setupSlider(prop_volumeSlider, propVolume);
     setSlide(prop_volumeSlider, 640, 520, 400, 50);
 
+    QtMaterialSlider *main_volumeSlider = new QtMaterialSlider(page);
+    setupSlider(main_volumeSlider, gameVolume);
+    setSlide(main_volumeSlider, 640, 720, 400, 50);
+
     connect(main_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleMainVolumeChange);
     connect(button_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleButtonVolumeChange);
     connect(boom_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleBoomVolumeChange);
     connect(victory_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleVictoryVolumeChange);
     connect(fail_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleFailVolumeChange);
     connect(prop_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handlePropVolumeChange);
+    connect(start_volumeSlider, &QtMaterialSlider::valueChanged, this, &SettingWindow::handleStartVolumeChange);
 
     page->show();
     return page;
@@ -297,42 +354,49 @@ void SettingWindow::handleMainVolumeChange(int value)
 {
     gameVolume = value;
     player_background->setVolume(gameVolume);
-    main_volumeLabel->setText(QString("主音乐音量: %1").arg(value));
+    main_volumeLabel->setText(QString("主音乐音量: %2").arg(value));
 }
 
 void SettingWindow::handleButtonVolumeChange(int value)
 {
-    buttonVolumn = value;
-    player_enterButton->setVolume(buttonVolumn);
-    button_volumeLabel->setText(QString("按钮音量: %1").arg(value));
+    buttonVolume = value;
+    player_enterButton->setVolume(buttonVolume);
+    button_volumeLabel->setText(QString("按钮音量: %2").arg(value));
 }
 
 void SettingWindow::handleBoomVolumeChange(int value)
 {
-    boomVolumn = value;
-    player_boom->setVolume(boomVolumn);
-    boom_volumeLabel->setText(QString("爆炸音量: %1").arg(value));
+    boomVolume = value;
+    player_boom->setVolume(boomVolume);
+    boom_volumeLabel->setText(QString("爆炸音量: %2").arg(value));
 }
 
 void SettingWindow::handleVictoryVolumeChange(int value)
 {
     victoryVolume = value;
     player_victory->setVolume(victoryVolume);
-    victory_volumeLabel->setText(QString("胜利音量: %1").arg(value));
+    victory_volumeLabel->setText(QString("胜利音量: %2").arg(value));
 }
 
 void SettingWindow::handleFailVolumeChange(int value)
 {
     failVolume = value;
     player_fail->setVolume(failVolume);
-    fail_volumeLabel->setText(QString("失败音量: %1").arg(value));
+    fail_volumeLabel->setText(QString("失败音量: %2").arg(value));
 }
 
 void SettingWindow::handlePropVolumeChange(int value)
 {
     propVolume = value;
     player_prop->setVolume(propVolume);
-    prop_volumeLabel->setText(QString("道具音量: %1").arg(value));
+    prop_volumeLabel->setText(QString("道具音量: %2").arg(value));
+}
+
+void SettingWindow::handleStartVolumeChange(int value)
+{
+    startVolume = value;
+    player_start->setVolume(startVolume);
+    start_volumeLabel->setText(QString("主音量: %2").arg(value));
 }
 
 void SettingWindow::handleKeyChange()
@@ -351,30 +415,51 @@ void SettingWindow::keyPressEvent(QKeyEvent *event)
     {
         int key = event->key();
         QString keyText = QKeySequence(key).toString();
-        if (currentKeyButton == KeyUpButton && key_check(key))
+        if (currentKeyButton == KeyUpButton && (key==KeyUp || key_check(key)))
         {
             KeyUp = key;
             KeyUpButton->setText("上: " + keyText);
         }
-        else if (currentKeyButton == keyDownButton && key_check(key))
+        else if (currentKeyButton == keyDownButton && (key==KeyDown || key_check(key)))
         {
             KeyDown = key;
             keyDownButton->setText("下: " + keyText);
         }
-        else if (currentKeyButton == KeyLeftButton && key_check(key))
+        else if (currentKeyButton == KeyLeftButton && (key==KeyLeft || key_check(key)))
         {
             KeyLeft = key;
             KeyLeftButton->setText("左: " + keyText);
         }
-        else if (currentKeyButton == KeyRightButton && key_check(key))
+        else if (currentKeyButton == KeyRightButton && (key==KeyRight || key_check(key)))
         {
             KeyRight = key;
             KeyRightButton->setText("右: " + keyText);
         }
-        else if (currentKeyButton == KeyShootButton && key_check(key))
+        else if (currentKeyButton == KeyShootButton && (key==KeyShoot || key_check(key)))
         {
             KeyShoot = key;
             KeyShootButton->setText("射击: " + keyText);
+        }
+        else if (currentKeyButton == KeyProp1Button && (key==KeyProp1 || key_check(key)))
+        {
+            KeyProp1 =key;
+            qDebug()<<"KeyProp1 setting:" << KeyProp1;
+            KeyProp1Button->setText("道具一: " + keyText);
+        }
+        else if (currentKeyButton == KeyProp2Button && (key==KeyProp2 || key_check(key)))
+        {
+            KeyProp2 =key;
+            KeyProp2Button->setText("道具二: " + keyText);
+        }
+        else if (currentKeyButton == KeyProp3Button && (key==KeyProp3 || key_check(key)))
+        {
+            KeyProp3 =key;
+            KeyProp3Button->setText("道具三: " + keyText);
+        }
+        else if (currentKeyButton == KeyProp4Button && (key==KeyProp4 || key_check(key)))
+        {
+            KeyProp4 =key;
+            KeyProp4Button->setText("道具四: " + keyText);
         }
         currentKeyButton = nullptr;
     }
@@ -382,7 +467,16 @@ void SettingWindow::keyPressEvent(QKeyEvent *event)
 
 bool SettingWindow::key_check(int key)
 {
-    return  (key != KeyDown && key != KeyLeft && key != KeyRight && key != KeyUp && key != KeyShoot);
+    if((key != KeyDown && key != KeyLeft && key != KeyRight && key != KeyUp && key != KeyShoot && key != KeyProp1 && key!= KeyProp2 && key!= KeyProp3 && key != KeyProp4))
+    {
+        return true;
+    }
+    else
+    {
+        qDebug()<<"1";
+        messageSnackbar->addMessage("键位不能重复");
+        return false;
+    }
 }
 
 void SettingWindow::handleReturn()
@@ -392,23 +486,6 @@ void SettingWindow::handleReturn()
 
 void SettingWindow::setupButton(QtMaterialRaisedButton*& button)
 {
-    //    button->setStyleSheet(
-    //                "QtMaterialRaisedButton {"
-    //                "   font-size: 40px;"             // 字体大小
-    //                "   font-weight: bold;"           // 字体粗体
-    //                "   color: white;"                // 文字颜色
-    //                "   background-color: #5CACEE;"   // 按钮背景颜色
-    //                "   border-radius: 20px;"         // 边框圆角
-    //                "   padding: 12px;"               // 内边距
-    //                "}"
-    //                "QtMaterialRaisedButton:hover {"
-    //                "   background-color: #1E90FF;"   // 悬停时背景颜色
-    //                "}"
-    //                "QtMaterialRaisedButton:pressed {"
-    //                "   background-color: #0B60AD;"   // 按下时背景颜色
-    //                "}"
-    //                );
-
     int fontId = QFontDatabase::addApplicationFont(Iron);
     QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
     QFont customFont(fontFamily, 28);
@@ -539,4 +616,14 @@ void SettingWindow::chooseTank6()
     item4->m_selected=false;item3->update();
     item5->m_selected=false;item4->update();
     item1->m_selected=false;item5->update();
+}
+
+bool SettingWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Enter)
+    {
+        player_enterButton->setPosition(0); // 将音效位置设置为开头，以便从头播放
+        player_enterButton->play();
+    }
+    return QObject::eventFilter(obj, event);
 }

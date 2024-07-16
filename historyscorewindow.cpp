@@ -72,7 +72,6 @@ void HistoryscoreWindow::setupUI()
                 "   background-color: rgba(255, 255, 255, 0);"  // 表头背景透明
                 "   color: white;"             // 表头字体颜色
                 "   font-size: 40px;"          // 表头字体大小
-                "   font-family: 'Verdana', sans-serif;"  // 表头字体
                 "   border: none;"                         // 无边框
                 "}"
                 );
@@ -96,7 +95,7 @@ void HistoryscoreWindow::setupUI()
     customFont2.setBold(true);
 
     scoreTableWidget->horizontalHeader()->setFont(customFont2);
-    scoreTableWidget->verticalHeader()->setVisible(true); // 隐藏行号
+    scoreTableWidget->verticalHeader()->setVisible(false); // 隐藏行号
 
     scoreTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     scoreTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -138,6 +137,8 @@ void HistoryscoreWindow::setupUI()
     returnButton->setRadius(12);
     returnButton->setFont(customFont);
 
+    returnButton->installEventFilter(this);
+
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     buttonLayout->addWidget(returnButton);
@@ -151,6 +152,7 @@ void HistoryscoreWindow::setupUI()
 
 void HistoryscoreWindow::loadScoresFromFile(const QString& filename)
 {
+    qDebug()<<"do load";
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -167,12 +169,15 @@ void HistoryscoreWindow::loadScoresFromFile(const QString& filename)
     {
         QString line = in.readLine();
         QStringList data = line.split(":");
-        if (data.size() == 2) {
+        if (data.size() == 2)
+        {
             QString playerName = data[0];
             int score = data[1].toInt();
             qDebug() << "读取到玩家：" << playerName << " 得分：" << score;
             scores.append(qMakePair(playerName, score));
-        } else {
+        }
+        else
+        {
             qDebug() << "读取行格式错误：" << line;
         }
     }
@@ -194,6 +199,10 @@ void HistoryscoreWindow::loadScoresFromFile(const QString& filename)
 
         playerNameItem->setTextAlignment(Qt::AlignCenter);
         scoreItem->setTextAlignment(Qt::AlignCenter);
+
+        // 设置单元格不可编辑
+        playerNameItem->setFlags(playerNameItem->flags() & ~Qt::ItemIsEditable);
+        scoreItem->setFlags(scoreItem->flags() & ~Qt::ItemIsEditable);
 
         scoreTableWidget->setItem(i, 0, playerNameItem);
         scoreTableWidget->setItem(i, 1, scoreItem);

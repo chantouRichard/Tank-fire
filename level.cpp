@@ -6,23 +6,106 @@
 #include<QPaintEvent>
 #include<QRandomGenerator>
 
-
 Level::Level(QWidget *parent)
     : QWidget(parent) ,score(0){
+    this->setWindowFlags(Qt::FramelessWindowHint);
     statusBar = new QLabel(this);
     statusText = new QLabel(statusBar);
+    statusProp=new QLabel(statusBar);
+    Prop1=new QLabel(statusProp);
+    Prop2=new QLabel(statusProp);
+    Prop3=new QLabel(statusProp);
+    Prop4=new QLabel(statusProp);
+    Prop1->resize(120,120);
+    Prop2->resize(120,120);
+    Prop3->resize(120,120);
+    Prop4->resize(120,120);
+    Prop1->move(30,70);
+    Prop2->move(170,70);
+    Prop3->move(30,220);
+    Prop4->move(170,220);
+
+    PageText =new QLabel(passPage);
+    PageText2=new QLabel(failPage);
+
+
+    for(int i=0;i<4;i++)
+    {
+        PropType[i]=0;
+    }
+
+    //道具栏的图标
+    QSize PropLabelSize(100,100);
+    pixtool1=QPixmap(prop1_pic);
+    pixtool2=QPixmap(prop2_pic);
+    pixtool3=QPixmap(prop3_pic);
+    pixtool4=QPixmap(prop4_pic);
+    pixtool_frost=QPixmap(frosted_ground);
+
+    pixColumnTool1=pixtool1;
+    pixColumnTool2=pixtool2;
+    pixColumnTool3=pixtool3;
+    pixColumnTool4=pixtool4;
+    pixColumnTool1 = pixColumnTool1.scaled(PropLabelSize, Qt::KeepAspectRatio);
+    pixColumnTool2 = pixColumnTool2.scaled(PropLabelSize, Qt::KeepAspectRatio);
+    pixColumnTool3 = pixColumnTool3.scaled(PropLabelSize, Qt::KeepAspectRatio);
+    pixColumnTool4 = pixColumnTool4.scaled(PropLabelSize, Qt::KeepAspectRatio);
     //通关界面
-    setFixedSize(1800, 1500);
+    setFixedSize(2000, 1200);
     setWindowTitle("tankfire");
     initColumn(statusBar,statusText);
-    setupUI();
-    show_failpage_show=false;
+    show_failpage_show = false;
     passwindowshown=0;
-    setedwater=0;
+
+    player_fail->setMedia(QUrl(fail_wav));
+    player_victory->setMedia(QUrl(victory_wav));
+
+    connect(this,&Level::pass_fail,player_fail,[=](){
+       is_main_music_play=false;
+       player_background->pause();
+       player_fail->play();
+    });
+
+    connect(this,&Level::pass_victory,player_fail,[=](){
+       is_main_music_play=false;
+       player_background->pause();
+       player_victory->play();
+    });
+
+    connect(this,&Level::Replay,[=](){
+        is_main_music_play=true;
+        player_background->play();
+        player_fail->setPosition(0);
+        player_fail->pause();
+    });
+
+    connect(this,&Level::back,[=](){
+        is_main_music_play=true;
+        player_background->play();
+        player_fail->setPosition(0);
+        player_fail->pause();
+    });
+
+    connect(this,&Level::Win,[=](){
+        is_main_music_play=true;
+        player_background->play();
+        player_victory->setPosition(0);
+        player_victory->pause();
+    });
+
+    connect(this,&Level::backButWin,[=](){
+        is_main_music_play=true;
+        player_background->play();
+        player_victory->setPosition(0);
+        player_victory->pause();
+    });
+}
+
+Level::~Level() {
+    // 清理工作
 }
 
 void Level::initchangeTimer(){
-    qDebug()<<"1  init";
     changeTimer=new QTimer(this);
     changeTimer->disconnect();
     changeTimer->stop();
@@ -30,76 +113,73 @@ void Level::initchangeTimer(){
     connect(changeTimer, &QTimer::timeout, this, &Level::onTimeout);
 }
 
-void Level::DeletechangeTimer() {
-
-         qDebug()<<" 1 remove";
-            changeTimer->stop();
-        changeTimer->disconnect();
-        delete changeTimer;
-        changeTimer = nullptr; // 将指针设为 nullptr，以防后续访问无效指针
-
+void Level::DeletechangTimer() {
+    changeTimer->stop();
+    changeTimer->disconnect();
+    delete changeTimer;
+    changeTimer = nullptr; // 将指针设为 nullptr，以防后续访问无效指针
 }
-
 // 在其他地方调用 DeletechangTimer 之前，进行检查
-Level::~Level() {
-    // 清理工作
-}
 
 void Level::keyReleaseEvent(QKeyEvent *event){
     my_tank->keyReleaseEvent(event);
 }
 
-void Level::setupUI() {
-    QPushButton *next = new QPushButton("Next level", this);
-    next->resize(150, 50);
-    next->move(675, 200);
-
-    QPushButton *backbutton = new QPushButton("Back", this);
-    backbutton->resize(100, 50);
-    backbutton->move(10, 10);
-
-    connect(backbutton, &QPushButton::clicked, [=]() {
-        emit this->back();
-    });
-
-    connect(next, &QPushButton::clicked, [=]() {
-        emit this->Win();
-    });
-}
-
-void Level::loadMap(int newMap[Mapx_size][Mapy_size]) {
-    for (int i = 0; i < Mapx_size; ++i) {
-        for (int j = 0; j < Mapy_size; ++j) {
+void Level::loadMap(const int newMap[Mapy_size][Mapx_size]) {
+    for (int i = 0; i < Mapy_size; ++i) {
+        for (int j = 0; j < Mapx_size; ++j) {
             MAP_Global[i][j] = newMap[i][j];
         }
     }
+
 }
 
 void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
     // 初始化状态栏
-    statusBar->setGeometry(1500, 0, 300, 1500);
+    statusBar->setGeometry(1680, 0, 320, 1500);
     statusBar->setStyleSheet(
-        "background-color: black;"
-        "border: 10px solid #888888;"
-        "border-radius: 20px;"
-        "padding: 20px;"
-        "box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);"
-    );
+                "background-color: black;"
+                "border-radius: 20px;"
+                "padding:0px;"
+                "box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);"
+                );
 
-    statusText->setGeometry(0, 0, 300, 800);
+    statusText->setGeometry(0, 0, 320, 400);
     statusText->setStyleSheet(
-        "color: white;"
-        "font-size: 40px;"
-        "font-family: Comic Sans MS, sans-serif;"
-        "padding: 10px;"
-        "text-align: center;"
-    );
+                "color: white;"
+                "font-size: 40px;"
+                "font-family: Comic Sans MS, sans-serif;"
+                "background-color: rgba(0, 0, 0, 0);"
+                );
     statusText->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+//    statusText->hide();
+    ////
+    QPixmap columnPicture(":/resource/background/column.jpg");
+    statusBar->setScaledContents(true);
+    statusBar->setPixmap(columnPicture);
+    ////
+    //道具栏
+    statusProp->setGeometry(0,400,320,500);
+    statusProp->setStyleSheet(
+                "color: white;"
+                "font-size: 26px;"
+                "font-family: Comic Sans MS, sans-serif;"
+                "text-align: center;"
+                "background-color: rgba(0, 0, 0, 0);"
+                );
+    statusProp->setAlignment(Qt::AlignHCenter);
+    statusProp->setText("道具栏\n"+QKeySequence(KeyProp1).toString()+"            "+QKeySequence(KeyProp2).toString()+"\n\n\n\n"+QKeySequence(KeyProp3).toString()+"             "+QKeySequence(KeyProp4).toString());
+    Prop1->setStyleSheet("border: 2px solid grey;");
+    Prop2->setStyleSheet("border: 2px solid grey;");
+    Prop3->setStyleSheet("border: 2px solid grey;");
+    Prop4->setStyleSheet("border: 2px solid grey;");
+
+    //    statusProp->hide();
 
     // 初始化计时器
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [=]() {
-        updateTime(statusText);
+        updateTime();
     });
     startTime = QDateTime::currentDateTime();
     timer->start(1000); // 每秒触发一次 timeout 信号
@@ -111,6 +191,7 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
                 "font-size: 40px;"
                 "padding: 10px;"
                 "font-family:Comic Sans MS;"
+                "background-color: rgba(0, 0, 0, 0);"
                 );
     next->resize(150, 70);
     next->move(75, 1800);
@@ -123,27 +204,7 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
                 "font-family:Comic Sans MS;"
                 );
     backbutton->resize(150, 70);
-    backbutton->move(75, 1300);
-
-    passButton = new QPushButton("Pass", statusBar);
-    passButton->setStyleSheet(
-                "color:white;"
-                "font-size: 40px;"
-                "padding: 10px;"
-                "font-family:Comic Sans MS;"
-                );
-    passButton->resize(150, 70);
-    passButton->move(75, 1800);
-
-    failButton=new QPushButton("Fail",statusBar);
-    failButton->setStyleSheet(
-                "color:white;"
-                "font-size: 40px;"
-                "padding: 10px;"
-                "font-family:Comic Sans MS;"
-                );
-    failButton->resize(150, 70);
-    failButton->move(75, 1800);
+    backbutton->move(75, 1100);
 
     backButWinbutton=new QPushButton("Back",statusBar);
     backButWinbutton->setStyleSheet(
@@ -155,7 +216,7 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
     backButWinbutton->resize(150, 70);
     backButWinbutton->move(75, 1800);
 
-    replay=new QPushButton("Replay",this);
+    replay=new QPushButton("Replay",statusBar);
     replay->setStyleSheet(
                 "color:white;"
                 "font-size: 40px;"
@@ -173,82 +234,22 @@ void Level::initColumn(QLabel* statusBar, QLabel* statusText) {
         emit this->Win();
     });
 
-    connect(passButton, &QPushButton::clicked, this, &Level::passPageShow);
-
-    connect(failButton,&QPushButton::clicked,this,&Level::failPageShow);
-
     connect(backButWinbutton,&QPushButton::clicked,[=](){
         emit this->backButWin();
     });
-}
 
+    connect(replay,&QPushButton::clicked,[=]{
+        qDebug()<<"emit once";
+        emit this->Replay();
+    });
+}
+//要改地图
 void Level::paintEvent(QPaintEvent *event) {
-    QPainter painter(this);
-    QBrush brush(Qt::black);
 
-    QPixmap pixWall1(":/1/Res/res/wall1.jpg");
-    QPixmap pixWall2(":/1/Res/res/block.png");
-    QPixmap pixtool1(":/1/Res/res/heart.png");
-        QPixmap pixtool2(":/1/Res/res/defend.png");
-        QPixmap pixtool3(":/1/Res/res/attack.png");
-        QPixmap pixtool4(":/1/Res/res/speed.png");
-
-    QPixmap pixmap_block(":/1/Res/res/slots.png");
-    QPixmap scaledPixmap = pixmap_block.scaled(60,60, Qt::KeepAspectRatio, Qt::FastTransformation);
-    QPixmap Babypig(":/1/Res/res/Baby_pig.png");
-    QPixmap scaledPixmappig = Babypig.scaled(60,60, Qt::KeepAspectRatio, Qt::FastTransformation);
-    for (int i = 0; i < Mapx_size; ++i) {
-        for (int j = 0; j < Mapy_size; ++j) {
-            if (MAP_Global[j][i] == 1) {
-                painter.drawPixmap(j * 60, i * 60, 60, 60, pixWall1);
-            } else if (MAP_Global[j][i] == 2) {
-                painter.drawPixmap(j * 60, i * 60, 60, 60, pixWall2);
-            }
-            else if(MAP_Global[j][i]==0){
-                painter.drawPixmap(j * 60, i * 60, 60, 60, scaledPixmap);
-            }
-            else if(MAP_Global[j][i]==5){
-                painter.drawPixmap(j * 60, i * 60, 60, 60, scaledPixmap);
-                painter.drawPixmap(j*60,i*60,60,60,scaledPixmappig);
-            }
-            else if(MAP_Global[j][i]==20){painter.drawPixmap(j*60,i*60,60,60,pixtool1);}
-                       else if(MAP_Global[j][i]==30){painter.drawPixmap(j*60,i*60,60,60,pixtool2);}
-                       else if(MAP_Global[j][i]==40){painter.drawPixmap(j*60,i*60,60,60,pixtool3);}
-                       else if(MAP_Global[j][i]==50){painter.drawPixmap(j*60,i*60,60,60,pixtool4);}
-        }
-    }
-    if(!setedwater){
-        watermove->setScaledSize(QSize(60,60));
-        watermove->start();
-        int k=0;
-        for (int i = 0; i < Mapx_size; ++i) {
-            for (int j = 0; j < Mapy_size; ++j) {
-                if (MAP_Global[j][i] == 3) {
-                    k++;
-                }
-                }
-        }
-        water=new QLabel*[k];
-        for(int i=0;i<k;i++){
-            water[i]=new QLabel(this);
-            water[i]->setMovie(watermove);
-            water[i]->setFixedSize(60,60);
-        }
-        setedwater=1;
-        k=0;
-        for (int i = 0; i < Mapx_size; ++i) {
-            for (int j = 0; j < Mapy_size; ++j) {
-                if (MAP_Global[j][i] == 3) {
-                    water[k]->move(j*60,i*60);
-                    water[k]->show();
-                    k++;
-                }
-                }
-        }
-    }
 }
 
-void Level::updateTime(QLabel* statusText) {
+void Level::updateTime() {
+
     QDateTime currentTime = QDateTime::currentDateTime();
     qint64 secondsPassed = startTime.secsTo(currentTime);
 
@@ -258,18 +259,113 @@ void Level::updateTime(QLabel* statusText) {
     int seconds = secondsPassed % 60;
 
     QString timeString = QString("%1:%2:%3")
-        .arg(hours, 2, 10, QChar('0'))
-        .arg(minutes, 2, 10, QChar('0'))
-        .arg(seconds, 2, 10, QChar('0'));
+            .arg(hours, 2, 10, QChar('0'))
+            .arg(minutes, 2, 10, QChar('0'))
+            .arg(seconds, 2, 10, QChar('0'));
 
-    QString text = QString("\n\nTime:\n %1\n\nScore: %2").arg(timeString).arg(score);
+    QString text = QString("\nTime:\n %1\nScore: %2\nHP:%3\nATTACK:%4").arg(timeString).arg(score).arg(my_tank->my_tank_live).arg(my_tank->attackforce);
     passTime = secondsPassed;
 
     statusText->setText(text);
+
+    for(int i=0;i<4;i++)
+    {
+        if(i==0)
+        {
+            switch (PropType[i])
+            {
+            case 0:
+                Prop1->clear();
+                break;
+            case 20:
+                //                qDebug()<<"20";
+                Prop1->setPixmap(pixColumnTool1);
+                break;
+            case 30:
+                //                qDebug()<<"30";
+                Prop1->setPixmap(pixColumnTool2);
+                break;
+            case 40:
+                //                qDebug()<<"40";
+                Prop1->setPixmap(pixColumnTool3);
+                break;
+            case 50:
+                //                qDebug()<<"50";
+                Prop1->setPixmap(pixColumnTool4);
+                break;
+            }
+        }
+        if(i==1)
+        {
+            switch (PropType[i])
+            {
+            case 0:
+                Prop2->clear();
+                break;
+            case 20:
+                Prop2->setPixmap(pixColumnTool1);
+                break;
+            case 30:
+                Prop2->setPixmap(pixColumnTool2);
+                break;
+            case 40:
+                Prop2->setPixmap(pixColumnTool3);
+                break;
+            case 50:
+                Prop2->setPixmap(pixColumnTool4);
+                break;
+            }
+        }
+        if(i==2)
+        {
+            switch (PropType[i])
+            {
+            case 0:
+                Prop3->clear();
+                break;
+            case 20:
+                Prop3->setPixmap(pixColumnTool1);
+                break;
+            case 30:
+                Prop3->setPixmap(pixColumnTool2);
+                break;
+            case 40:
+                Prop3->setPixmap(pixColumnTool3);
+                break;
+            case 50:
+                Prop3->setPixmap(pixColumnTool4);
+                break;
+            }
+        }
+        if(i==3)
+        {
+            switch (PropType[i])
+            {
+            case 0:
+                Prop4->clear();
+                break;
+            case 20:
+                Prop4->setPixmap(pixColumnTool1);
+                break;
+            case 30:
+                Prop4->setPixmap(pixColumnTool2);
+                break;
+            case 40:
+                Prop4->setPixmap(pixColumnTool3);
+                break;
+            case 50:
+                Prop4->setPixmap(pixColumnTool4);
+                break;
+            }
+        }
+    }
+    update();
+
 }
 
 void Level::initTank(int enemy_num,int *enemysx,int *enemysy,int my_tankx,int my_tanky) {
     // 通用的初始化主坦克的逻辑
+
     this->enemy_num=enemy_num;
     enemy_x_site=new int[enemy_num];
     enemy_y_site=new int[enemy_num];
@@ -280,10 +376,9 @@ void Level::initTank(int enemy_num,int *enemysx,int *enemysy,int my_tankx,int my
     //初始化敌人位置
     my_tank=new Tank(my_tankx,my_tanky,this);
     my_tank->showtank(this);
-    my_tank->control_mode=2;
-    connect(my_tank,&Tank::get_prop,[=](){
-        update();
-    });
+    connect(my_tank,&Tank::get_prop,this,&Level::HandleGetProp);
+    connect(my_tank,&Tank::use_prop,this,&Level::HandleKey);
+    connect(my_tank,&Tank::get_prop,[=](){update();});
     for(int i=0;i<bulletsnumber;i++)
     {
         Bullet* it=&my_tank->bugdet[i];
@@ -298,14 +393,13 @@ void Level::initEnemyTank(int enemy_num) {
     // 通用的初始化敌人坦克的逻辑
     enemys=new EnemyTank*[enemy_num];
     enemybullet* bul;
+
     for(int i=0;i<enemy_num;i++)
     {
         enemys[i]=new EnemyTank(enemy_x_site[i],enemy_y_site[i],my_tank,this);
-        //
         if(i==1){
-        enemys[1]->enemytank_style=2;
-             }
-        //
+            enemys[1]->enemytank_style=2;
+        }
         enemys[i]->showTank(this);
         for(int j=0;j<bulletsnumber;j++)
         {
@@ -313,26 +407,50 @@ void Level::initEnemyTank(int enemy_num) {
             connect(bul,&enemybullet::boom,this,&Level::updatemapforboom);
             connect(my_tank,&Tank::my_tank_move,bul,&enemybullet::getenemysit);
             connect(bul,&enemybullet::kill_my_tank,[=](){
-
                 my_tank->my_tank_live--;
-                if(my_tank->my_tank_live<=0)show_failpage_show=true;
+                show_failpage_show=false;
+                if(my_tank->my_tank_live<=0)
+                {
+                    my_tank->tank_img->move(-60,-60);
+                    show_failpage_show=true;
+                }
                 if(show_failpage_show)
+                {
                     failPageShow();
-                show_failpage_show=true;
+                    emit pass_fail();
+                }
             });
         }
         connect(enemys[i],&EnemyTank::enemy_move,this,&Level::updateenemysit);
     }
-}
+    emit my_tank->my_tank_move(my_tank->tankx,my_tank->tanky);
 
-void Level::dead() {
-    // 通用的判断主坦克死亡的逻辑
+
+
 }
 
 void Level::updatemapforboom(int mapx,int mapy){
-    if(MAP_Global[mapx][mapy]==1)
+    if(MAP_Global[mapx][mapy]==1||MAP_Global[mapx][mapy]==6)
     {
         MAP_Global[mapx][mapy]=0;
+    }
+
+    this->update();
+}
+
+void Level::updatemapforfrosted(int mapx, int mapy){
+    if(MAP_Global[mapx][mapy]==0||MAP_Global[mapx][mapy]==6||MAP_Global[mapx][mapy]>10)
+    {
+        MAP_Global[mapx][mapy]=70;
+    }
+
+    this->update();
+}
+
+void Level::updatemapforfired(int mapx, int mapy){
+    if(MAP_Global[mapx][mapy]==0||MAP_Global[mapx][mapy]==6||MAP_Global[mapx][mapy]>10)
+    {
+        MAP_Global[mapx][mapy]=60;
     }
 
     this->update();
@@ -341,8 +459,7 @@ void Level::updatemapforboom(int mapx,int mapy){
 void Level::Deletetank(){
     my_tank->my_tank_live=0;
     my_tank->tank_img->hide();
-    my_tank->Deletebullets();
-    my_tank->disconnect();
+
     for(int i=0;i<enemy_num;i++)
     {
         enemys[i]->enemy_tank_img->hide();
@@ -352,6 +469,8 @@ void Level::Deletetank(){
     }
     delete my_tank;
     delete[] enemys;
+
+
 }
 
 void Level::updateenemysit(){
@@ -362,28 +481,34 @@ void Level::updateenemysit(){
 }
 
 void Level::clear_enemytank(int id){
-    if(enemys[id]->enemy_HP==1){
-    score+=10;
-    enemys[id]->live=0;
-    enemys[id]->enemy_tank_img->hide();
-    enemys[id]->enemy_tank_img->move(-10,-10);
-    enemys[id]->currentX=-10;
-    enemys[id]->currentY=-10;
-    updateenemysit();
+    if(enemys[id]->enemy_HP<=my_tank->attackforce)
+    {
+        player_boom->setMedia(QUrl(boom_wav));
+        player_boom->setVolume(boomVolume);
+        player_boom->play();
+        score+=10;
+        enemys[id]->live=0;
+        enemys[id]->enemy_tank_img->hide();
+        enemys[id]->enemy_tank_img->move(-10,-10);
+        enemys[id]->currentX=-10;
+        enemys[id]->currentY=-10;
+        updateenemysit();
     }
     else
-       enemys[id]->enemy_HP--;
+        enemys[id]->enemy_HP-=my_tank->attackforce;
     bool check=1;
     for(int i=0;i<enemy_num;i++){
         if(enemys[i]->live){
             check=0;
+            break;
         }
     }
-    if(check) {
+    if(check)
+    {
+        emit pass_victory();
+        updateTime();
         passPageShow();
-        hide_all_tank();
-        qDebug()<<"you Win";
-}
+    }
 }
 
 void Level::resetTime() {
@@ -393,82 +518,76 @@ void Level::resetTime() {
 }
 
 void Level::passPageShow() {
-    passwindowshown=1;
+    HideProp();
+    hide_all_tank();
     timer->stop();
     //移动按钮
-    failButton->move(75,1800);
-    next->move(75, 1400);
+    if(ShowNextButton==true)next->move(75, 1000);
     backbutton->move(75,1800);
-    backButWinbutton->move(75,1300);
-    //
-    passPage = new QLabel(this); // 确保 passPage 是 QWidget 的实例
-    passPage->setGeometry(0, 0, 1500, 1500);
-    passPage->setStyleSheet("background-color: white;");
+    backButWinbutton->move(75,1100);
+
+    QPixmap PASSPAGE(victory_page_pic);
+    passPage->setGeometry(0, 0, 1680, 1200);
+    passPage->setPixmap(PASSPAGE);
     passPage->setVisible(true);
 
-    QHBoxLayout *layout = new QHBoxLayout(passPage); // 创建布局
+    PageText->setGeometry(90, 500, 420, 400);
+    QString PassText = QString("CONGRATULATION!\n你用时：%1s\n得分：%2").arg(passTime).arg(score);
+    PageText->setText(PassText);
+    PageText->setStyleSheet(
+        "color: black;"
+        "font-size: 40px;"
+        "font-family: Comic Sans MS;"
+        "padding: 10px;"
+        "text-align: center;"
+    );
+    PageText->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    PageText->setVisible(true);
 
-    ST1 = new QLabel(passPage);
-    ST2 = new QLabel(passPage);
-    ST3 = new QLabel(passPage);
-
-    QPixmap star(":/6/Res/res6/star1.png");
-    QPixmap restar(":/6/Res/res6/star2.png");
+    QPixmap star(star1_pic);
+    QPixmap restar(star2_pic);
     star1 = star.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     star2 = restar.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     ST1->setPixmap(star1);
     ST2->setPixmap(star1);
     ST3->setPixmap(star1);
-
-    layout->addWidget(ST1);
-    layout->addWidget(ST2);
-    layout->addWidget(ST3);
-
-    passPage->setLayout(layout); // 设置布局
+    ST1->move(60,300);
+    ST2->move(210,200);
+    ST3->move(360,300);
+    ST1->setVisible(true);
+    ST2->setVisible(true);
+    ST3->setVisible(true);
 
     grade(); // 调用 grade 函数
 }
 
-void Level::hide_all_tank(){
-    my_tank->tank_img->hide();
-    for(int i=0;i<bulletsnumber;i++){
-        my_tank->bugdet[i].BULA->hide();
-        my_tank->bugdet[i].BOOM->hide();
-        my_tank->bugdet[i].bigBOOM->hide();
-        my_tank->bugdet[i].BULA->move(-10,-10);
-    }
-    for(int i=0;i<enemy_num;i++)
-    {
-        enemys[i]->enemy_tank_img->hide();
-        enemys[i]->shootTimer->stop();
-        for(int j=0;j<bulletsnumber;j++){
-            enemys[i]->bullets[j].BULA->hide();
-            enemys[i]->bullets[j].BOOM->hide();
-            enemys[i]->bullets[j].bigBOOM->hide();
-            enemys[i]->bullets[j].BULA->move(-100,-100);
-            enemys[i]->bullets[j].enemyx=-200;
-            enemys[i]->bullets[j].enemyy=-200;
-        }
-
-    }
-}
-
 void Level::failPageShow()
 {
-    if(passwindowshown) return;
+    HideProp();
     timer->stop();
     //移动按钮
-    passButton->move(75,1800);
-    replay->move(75,1400);
-    backbutton->move(75,1300);
+    replay->move(75,1000);
+    backbutton->move(75,1100);
     //
-    failPage = new QLabel(this);
-    failPage->setGeometry(0, 0, 1500, 1500);
-    failPage->setStyleSheet("background-color: white;");
+    hide_all_tank();
+    QPixmap PASSPAGE2(fail_page_pic);
+    failPage->setPixmap(PASSPAGE2);
+    failPage->setGeometry(0, 0, 1680, 1200);
     failPage->setVisible(true);
-    failPage->setStyleSheet("background-color: white; color: red; font-size: 100px; font-family: Comic Sans MS;");
-    failPage->setText("你输了，你是傻逼");
+    PageText2->setGeometry(440,500,800,500);
+    PageText2->setText("YOU LOSE!");
+    PageText2->setStyleSheet(
+        "color: white;"
+        "font-size: 100px;"
+        "font-family: Comic Sans MS;"
+        "padding: 10px;"
+        "text-align: center;"
+    );
+    PageText2->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    PageText2->setVisible(true);
+
+
     failPage->setAlignment(Qt::AlignCenter);
 }
 
@@ -519,35 +638,33 @@ void Level::grade() {
 
 void Level::deletePassPage()
 {
-    failButton->move(75,1100);
+    backButWinbutton->move(75,1800);
+    backbutton->move(75,1100);
     next->move(75,1800);
     passPage->hide();
     ST1->hide();
     ST2->hide();
     ST3->hide();
-    failPage->hide();
 }
 
 void Level::deleteFailPage()
 {
     next->move(75,1800);
-    passButton->move(75,1200);
     replay->move(75,1800);
     failPage->hide();
 }
 
 void Level::changeRandomZeroToOne() {
     QVector<QPoint> zeroPositions;
-    for (int x = 0; x < Mapx_size; ++x) {
-        for (int y = 0; y < Mapy_size; ++y) {
-            if (MAP_Global[x][y] == 0) {
-                zeroPositions.append(QPoint(x, y));
+    for (int i = 0; i < Mapy_size; i++) {
+        for (int j = 0; j < Mapx_size; j++) {
+            if (MAP_Global[i][j] == 0) {
+                zeroPositions.append(QPoint(i, j));
             }
         }
     }
 
     if (!zeroPositions.isEmpty()) {
-        qDebug()<<"1";
         int randomIndex = QRandomGenerator::global()->bounded(zeroPositions.size());
         QPoint randomPoint = zeroPositions[randomIndex];
         MAP_Global[randomPoint.x()][randomPoint.y()] = (rand()%4+2)*10;
@@ -557,5 +674,142 @@ void Level::changeRandomZeroToOne() {
 
 void Level::onTimeout() {
     changeRandomZeroToOne();
-//    changeTimer->start(QRandomGenerator::global()->bounded(25000, 25001)); // 重新设置定时器
+    //    changeTimer->start(QRandomGenerator::global()->bounded(25000, 25001)); // 重新设置定时器
+}
+
+void Level::hide_all_tank(){
+    my_tank->tank_img->move(-100,-100);
+    my_tank->tankx=my_tank->tanky=-100;
+    for(int i=0;i<bulletsnumber;i++){
+        my_tank->bugdet[i].BULA->hide();
+        my_tank->bugdet[i].BOOM->hide();
+        my_tank->bugdet[i].BULA->move(-10,-10);
+    }
+    for(int i=0;i<enemy_num;i++)
+    {
+        enemys[i]->enemy_tank_img->hide();
+        enemys[i]->shootTimer->stop();
+        for(int j=0;j<bulletsnumber;j++){
+            enemys[i]->bullets[j].BULA->hide();
+            enemys[i]->bullets[j].BOOM->hide();
+            enemys[i]->bullets[j].BULA->move(-100,-100);
+            enemys[i]->bullets[j].enemyx=-200;
+            enemys[i]->bullets[j].enemyy=-200;
+        }
+
+    }
+
+
+}
+
+int Level::GetColumnIndex()
+{
+    for(int i=0;i<4;i++)
+    {
+        if(PropType[i]==0)return i;
+    }
+    return -1;
+}
+
+void Level::HandleGetProp(int id)
+{
+    if(GetColumnIndex()!=-1)
+    {
+        PropType[GetColumnIndex()]=id;
+    }
+}
+
+void Level::HandleKey(int id)
+{
+      if(id<0) return;
+//    if(id==0)
+//    {
+        switch (PropType[id])
+        {
+        case 20:
+            my_tank->addLife(1);
+            break;
+        case 30:
+            my_tank->shield();
+            break;
+        case 40:
+            my_tank->attack();
+            break;
+        case 50:
+            my_tank->speedUp();
+            break;
+        }
+        PropType[id]=0;
+//    }
+//    if(id==1)
+//    {
+//        switch (PropType[id])
+//        {
+//        case 20:
+//            my_tank->addLife(1);
+//            break;
+//        case 30:
+//            my_tank->shield();
+//            break;
+//        case 40:
+//            my_tank->attack();
+//            break;
+//        case 50:
+//            my_tank->speedUp();
+//            break;
+//        }
+//        PropType[id]=0;
+//    }
+//    if(id==2)
+//    {
+//        switch (PropType[id])
+//        {
+//        case 20:
+//            my_tank->addLife(1);
+//            break;
+//        case 30:
+//            my_tank->shield();
+//            break;
+//        case 40:
+//            my_tank->attack();
+//            break;
+//        case 50:
+//            my_tank->speedUp();
+//            break;
+//        }
+//        PropType[id]=0;
+//    }
+//    if(id==3)
+//    {
+
+//        switch (PropType[id])
+//        {
+//        case 20:
+//            my_tank->addLife(1);
+//            break;
+//        case 30:
+//            my_tank->shield();
+//            break;
+//        case 40:
+//            my_tank->attack();
+//            break;
+//        case 50:
+//            my_tank->speedUp();
+//            break;
+//        }
+//        PropType[id]=0;
+//    }
+}
+
+void Level::HideProp()
+{
+    for(int i=0;i<4;i++)
+    {
+        PropType[i]=0;
+    }
+    Prop1->clear();
+    Prop2->clear();
+    Prop3->clear();
+    Prop4->clear();
+    statusText->setText("\nTime:\n 00:00:00\nScore: 0\nHP:1\nATTACK:1");
 }

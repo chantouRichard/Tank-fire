@@ -57,7 +57,7 @@ public:
     void showTank(QWidget*pa);
     void getDire_BFS(int sx,int sy,int ex,int ey,QVector<QVector<bool>>& visited);
     void shoot();
-    void startshoottime();
+    void startshoottime(int w);
     void Deletebullets();
 private slots:
     void updatePosition();

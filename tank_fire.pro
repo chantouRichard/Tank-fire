@@ -20,6 +20,10 @@ SOURCES += \
     bullet.cpp \
     enemybullet.cpp \
     enemytank.cpp \
+    firebullet.cpp \
+    firetank1.cpp \
+    frostbullet1.cpp \
+    frostenemy1.cpp \
     global.cpp \
     historyscorewindow.cpp \
     level.cpp \
@@ -33,13 +37,18 @@ SOURCES += \
     mygraphicspicitem.cpp \
     passWindow.cpp \
     simplebutton.cpp \
-    tank.cpp
+    tank.cpp \
+    transimplebutton.cpp
 
 HEADERS += \
     SettingWindow.h \
     bullet.h \
     enemybullet.h \
     enemytank.h \
+    firebullet.h \
+    firetank1.h \
+    frostbullet1.h \
+    frostenemy1.h \
     global.h \
     historyscorewindow.h \
     level.h \
@@ -52,7 +61,8 @@ HEADERS += \
     mygraphicspicitem.h \
     passWindow.h \
     simplebutton.h \
-    tank.h
+    tank.h \
+    transimplebutton.h
 
 FORMS += \
     mainwindow.ui

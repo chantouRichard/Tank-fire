@@ -15,15 +15,13 @@ class HistoryscoreWindow : public QMainWindow
 public:
     explicit HistoryscoreWindow(QWidget *parent = nullptr);
     ~HistoryscoreWindow();
-
+    void setupUI();
+    void loadScoresFromFile(const QString& filename);
     HoverFillButton* returnButton; // 返回按钮公共属性
 
 private:
     QTableWidget* scoreTableWidget;
-    QtMaterialScrollBar* verticalScrollBar;
-
-    void setupUI();
-    void loadScoresFromFile(const QString& filename);
+    QtMaterialScrollBar* verticalScrollBar;    
 
 signals:
 
