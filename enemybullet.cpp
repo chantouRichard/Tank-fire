@@ -46,3 +46,10 @@ void enemybullet::bulletboom(int boomsitx, int boomsity) {
     });
 
 }
+
+//void enemybullet::set_parent(EnemyTank *parent)
+//{
+//    this->parent=parent;
+//}
+
+

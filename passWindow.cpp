@@ -118,9 +118,11 @@ void PassWindow::setupLevel0Button(QPushButton *button, level1 *level, QPushButt
             level->Deletetank();
             level->Initmap();
             level->show();
-            level->enemy1->startshoottime();
-            level->enemy2->startshoottime();
-            level->enemy3->startshoottime();
+            int enemy_num=level->enemy_num;
+            for(int i=0;i<enemy_num;i++)
+            {
+                level->enemys[i]->startshoottime();
+            }
 
             connect(level,&level1::Win,[=](){
                 pass_judge[0]=true;
@@ -133,8 +135,6 @@ void PassWindow::setupLevel0Button(QPushButton *button, level1 *level, QPushButt
             });
 
             connect(level,&level1::back,this,[=](){
-                level->Deletetank();
-                level->Initmap();
                 this->show();
                 level->close();
             });

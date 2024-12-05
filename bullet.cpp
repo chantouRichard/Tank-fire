@@ -1,4 +1,5 @@
 #include "bullet.h"
+#include"global.h"
 
 Bullet::Bullet(QWidget *parent) : QWidget(parent)
 {
@@ -11,7 +12,7 @@ Bullet::Bullet(QWidget *parent) : QWidget(parent)
     Bigboom.load(":/1/Res/res/blast4.gif");
 
     BULA->setPixmap(BULL);
-    BULA->setParent(parent);  
+    BULA->setParent(parent);
     BOOM->setPixmap(Boom);
     bigBOOM->setPixmap(Bigboom);
 
@@ -20,14 +21,6 @@ Bullet::Bullet(QWidget *parent) : QWidget(parent)
     bigboomtimer=new QTimer(this);
     bullettimer->start(10);
     started=false;
-}
-
-void Bullet::Loadmap(int map[25][25]){
-    for(int i=0;i<25;i++){
-        for(int j=0;j<25;j++){
-            MAP[i][j]=map[i][j];
-        }
-    }
 }
 
 void Bullet::Disconnected(){
@@ -49,32 +42,9 @@ void Bullet::Disconnected(){
     }
 }
 
-void Bullet::bulletboom(int boomsitx,int boomsity){
-    BULA->hide();
-    Disconnected();
-    boomtimer->start(150);
-    BOOM->setParent(BULA->parentWidget());
-    bigBOOM->setParent(BULA->parentWidget());
-    BOOM->move(boomsitx,boomsity);
-    BOOM->show();
-    connect(boomtimer,&QTimer::timeout,[&](){
-        BOOM->hide();
-        bigboomtimer->start(350);
-        bigBOOM->setParent(BULA->parentWidget());
-        bigBOOM->move(60*boommapsitx-30,60*boommapsity-20);
-        bigBOOM->show();
-        connect(bigboomtimer,&QTimer::timeout,[&](){
-            bigBOOM->hide();
-            bigboomtimer->stop();
-            bigboomtimer->disconnect();
-        });
-        boomtimer->stop();
-        boomtimer->disconnect();
-    });
-}
-
 void Bullet::moveup(){
-    if(!checkmovebullet()){
+    if(!checkmovebullet())
+    {
         buy=buy-5;
         updatemapsit();
         BULA->move(bux,buy);
@@ -152,15 +122,9 @@ void Bullet::movebullet(QWidget* parent,int style,int x,int y){
 }
 
 bool Bullet::checkmovebullet(){
-    if(checkshootenemy()){
-        boommapsitx=mapbux;
-        boommapsity=mapbuy;
-        bulletboom(bux-50,buy-50);
-        emit boom(mapbux,mapbuy);
-        return true;
-    }
+
     if(type==1){
-        if(MAP[mapbux][mapbuy]!=0)
+        if(MAP_Global[mapbux][mapbuy]!=0)
         {
             boommapsitx=mapbux;
             boommapsity=mapbuy;
@@ -168,7 +132,7 @@ bool Bullet::checkmovebullet(){
             emit boom(mapbux,mapbuy);
             return true;
         }
-        if(!MAP[mapbux][mapbuy-1]){
+        if(!MAP_Global[mapbux][mapbuy-1]){
             return false;
         }
         else{
@@ -184,7 +148,7 @@ bool Bullet::checkmovebullet(){
         }
     }
     if(type==2){
-        if(!MAP[mapbux][mapbuy+1]){
+        if(!MAP_Global[mapbux][mapbuy+1]){
             return false;
         }
         else{
@@ -197,17 +161,17 @@ bool Bullet::checkmovebullet(){
                 bulletboom(bux-50,buy-50);
                 emit boom(mapbux,mapbuy+1);
                 return true;
-        }}
+            }}
     }
     if(type==3){
-        if(MAP[mapbux][mapbuy]!=0){
+        if(MAP_Global[mapbux][mapbuy]!=0){
             boommapsitx=mapbux;
             boommapsity=mapbuy;
             bulletboom(bux-50,buy-50);
             emit boom(mapbux,mapbuy);
             return true;
         }
-        if( !MAP[mapbux-1][mapbuy])
+        if( !MAP_Global[mapbux-1][mapbuy])
             return false;
         else{
             if(bux>60*mapbux)
@@ -222,7 +186,7 @@ bool Bullet::checkmovebullet(){
         }
     }
     if(type==4){
-        if(! MAP[mapbux+1][mapbuy])
+        if(! MAP_Global[mapbux+1][mapbuy])
             return false;
         else{
             if(bux+5<60*(mapbux+1)){
@@ -234,7 +198,7 @@ bool Bullet::checkmovebullet(){
                 bulletboom(bux-50,buy-50);
                 emit boom(mapbux+1,mapbuy);
                 return true;
-        }
+            }
         }
     }
 }
@@ -244,13 +208,33 @@ void Bullet::updatemapsit(){
     mapbuy=buy/60;
 }
 
-void Bullet::updateenemy(int x,int y){
-    enemyx=x;
-    enemyy=y;
-}
 bool Bullet::checkshootenemy(){
-     if(bux>=enemyx&&bux<=(enemyx+60)&&buy>=enemyy&&bux<=(enemyx+60))
-         return true;
-     else
-         return false;
+    if(bux>=enemyx&&bux<=(enemyx+60)&&buy>=enemyy&&bux<=(enemyx+60))
+        return true;
+    else
+        return false;
+}
+
+void Bullet::bulletboom(int boomsitx,int boomsity){
+    BULA->hide();
+    Disconnected();
+    boomtimer->start(150);
+    BOOM->setParent(BULA->parentWidget());
+    bigBOOM->setParent(BULA->parentWidget());
+    BOOM->move(boomsitx,boomsity);
+    BOOM->show();
+    connect(boomtimer,&QTimer::timeout,[&](){
+        BOOM->hide();
+        bigboomtimer->start(350);
+        bigBOOM->setParent(BULA->parentWidget());
+        bigBOOM->move(60*boommapsitx-30,60*boommapsity-20);
+        bigBOOM->show();
+        connect(bigboomtimer,&QTimer::timeout,[&](){
+            bigBOOM->hide();
+            bigboomtimer->stop();
+            bigboomtimer->disconnect();
+        });
+        boomtimer->stop();
+        boomtimer->disconnect();
+    });
 }

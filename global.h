@@ -1,7 +1,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 #include<QString>
-
+#include<QMediaPlayer>
+#include<QMediaPlaylist>
 extern int gameVolume;
 extern int KeyUp;
 extern int KeyLeft;
@@ -14,6 +15,10 @@ extern int enemy_speed;
 extern int bulletsnumber;
 const int Mapx_size=25;
 const int Mapy_size=25;
+extern int MAP_Global[Mapx_size][Mapy_size];
 extern QString filename;
+extern QMediaPlayer* player_background;
+extern QMediaPlayer* player_boom;
+extern QMediaPlaylist *playlist;
 
 #endif // GLOBAL_H

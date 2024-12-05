@@ -37,7 +37,7 @@ void Level::setupUI() {
 void Level::loadMap(int newMap[Mapx_size][Mapy_size]) {
     for (int i = 0; i < Mapx_size; ++i) {
         for (int j = 0; j < Mapy_size; ++j) {
-            map[i][j] = newMap[i][j];
+            MAP_Global[i][j] = newMap[i][j];
         }
     }
 }
@@ -51,9 +51,9 @@ void Level::paintEvent(QPaintEvent *event) {
 
     for (int i = 0; i < Mapx_size; ++i) {
         for (int j = 0; j < Mapy_size; ++j) {
-            if (map[j][i] == 1) {
+            if (MAP_Global[j][i] == 1) {
                 painter.drawPixmap(j * 60, i * 60, 60, 60, pixWall1);
-            } else if (map[j][i] == 2) {
+            } else if (MAP_Global[j][i] == 2) {
                 painter.drawPixmap(j * 60, i * 60, 60, 60, pixWall2);
             }
         }
@@ -73,14 +73,10 @@ void Level::dead() {
 }
 
 void Level::updatemapforboom(int mapx,int mapy){
-    if(map[mapx][mapy]==1)
+    if(MAP_Global[mapx][mapy]==1)
     {
-        map[mapx][mapy]=0;
+        MAP_Global[mapx][mapy]=0;
     }
 
     this->update();
-    my_tank->Loadmap(map);
-    for(int i=0;i<bulletsnumber;i++){
-        my_tank->bugdet[i].Loadmap(map);
-    }
 }

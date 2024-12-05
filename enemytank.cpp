@@ -6,49 +6,267 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QBrush>
-#include <global.h>
 #include <QWidget>
 #include<QTimer>
 #include<QLabel>
-#include"tank.h"
+#include<QDebug>
 
+Box::Box(int x,int y,Box* pre)
+{
+    this->x=x;
+    this->y=y;
+    this->pre=pre;
+}
 
-EnemyTank::EnemyTank(int startX, int startY, QWidget* parent)
-    : QWidget(parent), currentX(startX), currentY(startY), angle(90), isPaused(false), moveCounter(0) {
+int dx[4]={1,0,-1,0};
+int dy[4]={0,1,0,-1};
+
+EnemyTank::EnemyTank(int startX, int startY, Tank*& my_tank,QWidget* parent)
+    : QWidget(parent), currentX(startX), currentY(startY), angle(90), isPaused(false), moveCounter(0) ,playerTank(my_tank) {
     idx=-1;
-    tank_img=new QLabel();
+    enemy_tank_img=new QLabel();
 }
 
 void EnemyTank::showTank(QWidget*pa)
 {
-    tank_img->setParent(pa);
-    TANK.load(":/2/Res/res2/up.jpg");
-    tank_img->setPixmap(TANK);
-    tank_img->move(currentX,currentY);
-    tank_img->show();
+    enemy_tank_img->setParent(pa);
+    Enemy_Tank.load(":/2/Res/res2/up.jpg");
+    enemy_tank_img->setPixmap(Enemy_Tank);
+    enemy_tank_img->move(currentX,currentY);
     //设置坦克图片始终在顶部
-    tank_img->setWindowFlags(tank_img->windowFlags() | Qt::WindowStaysOnTopHint);
-
-//    setPixmap(QPixmap(":/2/Res/res2/up.jpg")); // 初始图像
+    enemy_tank_img->setWindowFlags(enemy_tank_img->windowFlags() | Qt::WindowStaysOnTopHint);
     moveTimer = new QTimer(this);
-
+    moveTimer->start(50); // 每20毫秒更新一次位置
     connect(moveTimer, &QTimer::timeout, this, &EnemyTank::updatePosition);
-    moveTimer->start(20); // 每20毫秒更新一次位置
 
     pauseTimer = new QTimer(this);
     connect(pauseTimer, &QTimer::timeout, this, &EnemyTank::resumeMovement);
     srand(static_cast<unsigned>(time(0)));
+}
 
-//    setPos(currentX * 3, currentY * 3); // 设置初始位置
+void EnemyTank::updatePosition() {
+    if (isPaused) return;
+
+    if (moveCounter >= maxMoveSteps) {
+        chooseNewDirection_smarter();
+        moveCounter = 0;
+    } else {
+        moveCounter++;
+
+    }
+    updatemapsit();
+    int stepSize = 5; // 设置步长
+    switch (angle) {
+    case 0: // Up
+        if (!irremovable()) currentY -= stepSize;
+        Enemy_Tank.load(":/2/Res/res2/up.jpg");
+        enemy_tank_img->setPixmap(Enemy_Tank);
+        enemy_tank_img->move(currentX,currentY);
+        break;
+    case 90: // Right
+        if (!irremovable()) currentX += stepSize;
+        Enemy_Tank.load(":/2/Res/res2/right.jpg");
+        enemy_tank_img->setPixmap(Enemy_Tank);
+        enemy_tank_img->move(currentX,currentY);
+        break;
+    case 180: // Down
+        if (!irremovable()) currentY += stepSize;
+        Enemy_Tank.load(":/2/Res/res2/down.jpg");
+        enemy_tank_img->setPixmap(Enemy_Tank);
+        enemy_tank_img->move(currentX,currentY);
+        break;
+    case 270: // Left
+        if (!irremovable()) currentX -= stepSize;
+        Enemy_Tank.load(":/2/Res/res2/left.jpg");
+        enemy_tank_img->setPixmap(Enemy_Tank);
+        enemy_tank_img->move(currentX,currentY);
+        break;
+    }
+    if (rand() % 100 == 0) { // 5%的概率暂停
+        isPaused = true;
+        pauseTimer->start(500); // 暂停1秒
+    }
+    updata_enemy_site();
+}
+
+void EnemyTank::resumeMovement() {
+    isPaused = false;
+    pauseTimer->stop();
+}
+
+void EnemyTank::chooseNewDirection() {
+    int direction = rand() % 4;
+    switch (direction) {
+    case 0:
+        angle = 0; // Up
+        break;
+    case 1:
+        angle = 90; // Right
+        break;
+    case 2:
+        angle = 180; // Down
+        break;
+    case 3:
+        angle = 270; // Left
+        break;
+    }
+}
+
+void EnemyTank::chooseNewDirection_smarter(){
+    int end_x=(playerTank->tankx+30)/60;
+    int end_y=(playerTank->tanky+30)/60;
+    int start_x=(currentX+30)/60;
+    int start_y=(currentY+30)/60;
+
+    QVector<QVector<bool>> visited(Mapy_size,QVector<bool>(Mapx_size,false));
+    getDire_BFS(start_x,start_y,end_x,end_y,visited);
+}
+
+void EnemyTank::getDire_BFS(int sx, int sy, int ex, int ey, QVector<QVector<bool>>& visited)
+{
+    QQueue<Box*> record;
+    QQueue<Box*> qu;
+    Box* box = new Box(sx, sy, nullptr);
+    qu.push_back(box);
+    record.push_back(box);
+    visited[sx][sy] = true;
+    int curx, cury, tempx, tempy;
+
+    while (!qu.empty()) {
+        box = qu.front();
+        qu.pop_front();
+        curx = box->x;
+        cury = box->y;
+
+        if (curx == ex && cury == ey) {
+            break;
+        }
+
+        for (int i = 0; i < 4; ++i) {
+            tempx = curx + dx[i];
+            tempy = cury + dy[i];
+
+            if (tempx >= 0 && tempx < Mapx_size && tempy >= 0 && tempy < Mapy_size && MAP_Global[tempx][tempy] == 0 && !visited[tempx][tempy]) {
+                Box* addbox = new Box(tempx, tempy, box);
+                qu.push_back(addbox);
+                record.push_back(addbox);
+                visited[tempx][tempy    ] = true;
+            }
+        }
+    }
+
+    // 处理找到路径或未找到路径的情况
+    if (!qu.empty() && box->x == ex && box->y == ey)
+    {
+        while (box->pre != nullptr && (box->pre->x != sx || box->pre->y != sy))
+        {
+            box = box->pre;
+        }
+        if (box->pre == nullptr)
+        {
+            int direction = rand() % 4;
+            switch (direction) {
+            case 0:
+                angle = 0; // Up
+                break;
+            case 1:
+                angle = 90; // Right
+                break;
+            case 2:
+                angle = 180; // Down
+                break;
+            case 3:
+                angle = 270; // Left
+                break;
+            }
+        }
+        else
+        {
+            if (box->x == sx + 1)   //right
+                angle = 90;
+            else if (box->x == sx - 1)  //left
+                angle = 270;
+            else if (box->y == sy - 1)  //up
+                angle = 0;
+            else    //down
+                angle = 180;
+        }
+    }
+    else
+    {
+        int direction = rand() % 4;
+        switch (direction)
+        {
+        case 0:
+            angle = 0; // Up
+            break;
+        case 1:
+            angle = 90; // Right
+            break;
+        case 2:
+            angle = 180; // Down
+            break;
+        case 3:
+            angle = 270; // Left
+            break;
+        }
+    }
+
+    // 释放动态分配的内存
+    while (!record.isEmpty())
+    {
+        Box* temp = record.front();
+        record.pop_front();
+        delete temp;
+    }
 
 }
 
-void EnemyTank::addenemybullet(){
-    for(int i=0;i<bulletsnumber;i++)
-    {
-        budget[i].Loadmap(initEnemyMap);
+bool EnemyTank::irremovable() {
+
+    if (currentX % 60 == 0 || currentY % 60 == 0) {
+        if (angle == 0) {
+            if (currentX % 60 == 0) {
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 - 1] && (currentY % 60 == 0);
+            } else {
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 - 1] || MAP_Global[map_enemy_tankx2][map_enemy_tanky2 - 1];
+            }
+        }
+        if (angle == 180) {
+            if (currentX % 60 == 0) {
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 + 1] && (currentY % 60 == 0);
+            } else {
+                return MAP_Global[map_enemy_tankx1][map_enemy_tanky1 + 1] || MAP_Global[map_enemy_tankx2][map_enemy_tanky2 + 1];
+            }
+        }
+        if (angle == 270) {
+            if (currentY % 60 == 0) {
+                return MAP_Global[map_enemy_tankx1 - 1][map_enemy_tanky1] && (currentX % 60 == 0);
+            } else {
+                return MAP_Global[map_enemy_tankx1 - 1][map_enemy_tanky1] || MAP_Global[map_enemy_tankx4 - 1][map_enemy_tanky4];
+            }
+        }
+        if (angle == 90) {
+            if (currentY % 60 == 0) {
+                return MAP_Global[map_enemy_tankx1 + 1][map_enemy_tanky1] && (currentX % 60 == 0);
+            } else {
+                return MAP_Global[map_enemy_tankx1 + 1][map_enemy_tanky1] || MAP_Global[map_enemy_tankx4 + 1][map_enemy_tanky4];
+            }
+        }
     }
-    }//敌方装弹
+    return !((!MAP_Global[map_enemy_tankx1][map_enemy_tanky1]) && (!MAP_Global[map_enemy_tankx2][map_enemy_tanky2]) && (!MAP_Global[map_enemy_tankx3][map_enemy_tanky3]) && (!MAP_Global[map_enemy_tankx4][map_enemy_tanky4]));
+}
+
+void EnemyTank::updatemapsit(){
+    map_enemy_tankx1=currentX/60;
+    map_enemy_tanky1=currentY/60;
+    map_enemy_tankx2=(currentX+60)/60;
+    map_enemy_tanky2=map_enemy_tanky1;
+    map_enemy_tankx3=map_enemy_tankx2;
+    map_enemy_tanky3=(currentY+60)/60;
+    map_enemy_tankx4=map_enemy_tankx1;
+    map_enemy_tanky4=map_enemy_tanky3;
+}
 
 void EnemyTank::shoot(){
     if(angle==0)
@@ -62,82 +280,21 @@ void EnemyTank::shoot(){
 
     idx++;
     if(idx<=bulletsnumber-1)
-        budget[idx].movebullet(this->parentWidget(),this->type,currentX,currentY);
+        bullets[idx].movebullet(this->parentWidget(),this->type,currentX,currentY);
     else
     {
         if(idx<2*bulletsnumber){
-            budget[idx-bulletsnumber].Disconnected();
-            budget[idx-bulletsnumber].movebullet(this->parentWidget(),this->type,currentX,currentY);
+            bullets[idx-bulletsnumber].Disconnected();
+            bullets[idx-bulletsnumber].movebullet(this->parentWidget(),this->type,currentX,currentY);
         }
         else
         {
             idx=bulletsnumber;
-            budget[idx-bulletsnumber].Disconnected();
-            budget[idx-bulletsnumber].movebullet(this->parentWidget(),this->type,currentX,currentY);
+            bullets[idx-bulletsnumber].Disconnected();
+            bullets[idx-bulletsnumber].movebullet(this->parentWidget(),this->type,currentX,currentY);
         }
 
     }
-
-
-
-}
-
-void EnemyTank::updatePosition() {
-    if (rand() % 100 == 0) { // 5%的概率暂停
-        isPaused = true;
-        pauseTimer->start(500); // 暂停1秒
-    }
-    if (isPaused) return;
-
-    if (moveCounter >= maxMoveSteps) {
-        chooseNewDirection();
-        moveCounter = 0;
-    } else {
-        moveCounter++;
-//        qDebug()<<moveCounter;
-    }
-    updatemapsit();
-    int stepSize = 5; // 设置步长
-//    qDebug()<<"nmd";
-    switch (angle) {
-        case 0: // Up
-            if (!irremovable()) currentY -= stepSize;
-            TANK.load(":/2/Res/res2/up.jpg");
-            tank_img->setPixmap(TANK);
-            tank_img->move(currentX,currentY);
-//            qDebug()<<"1";
-            break;
-        case 90: // Right
-            if (!irremovable()) currentX += stepSize;
-            TANK.load(":/2/Res/res2/right.jpg");
-            tank_img->setPixmap(TANK);
-            tank_img->move(currentX,currentY);
-//            qDebug()<<"2";
-            break;
-        case 180: // Down
-            if (!irremovable()) currentY += stepSize;
-            TANK.load(":/2/Res/res2/down.jpg");
-            tank_img->setPixmap(TANK);
-            tank_img->move(currentX,currentY);
-//            qDebug()<<"3";
-            break;
-        case 270: // Left
-            if (!irremovable()) currentX -= stepSize;
-            TANK.load(":/2/Res/res2/left.jpg");
-            tank_img->setPixmap(TANK);
-            tank_img->move(currentX,currentY);
-//            qDebug()<<"4";
-            break;
-    }
-//    qDebug()<<currentX<<' '<<currentY<<' '<<irremovable();
-
-//    setPos(currentX * 3, currentY * 3);
-
-}
-
-void EnemyTank::resumeMovement() {
-    isPaused = false;
-    pauseTimer->stop();
 }
 
 void  EnemyTank::startshoottime(){
@@ -145,75 +302,9 @@ void  EnemyTank::startshoottime(){
     shootTimer->start(1000);
     connect(shootTimer,&QTimer::timeout,this,&EnemyTank::shoot);
 }
-void EnemyTank::chooseNewDirection() {
-    int direction = rand() % 4;
-    switch (direction) {
-        case 0:
-            angle = 0; // Up
-            break;
-        case 1:
-            angle = 90; // Right
-            break;
-        case 2:
-            angle = 180; // Down
-            break;
-        case 3:
-            angle = 270; // Left
-            break;
-    }
-}
 
-
-bool EnemyTank::irremovable() {
-
-    if (currentX % 60 == 0 || currentY % 60 == 0) {
-        if (angle == 0) {
-            if (currentX % 60 == 0) {
-                return MAP[maptankx1][maptanky1 - 1] && (currentY % 60 == 0);
-            } else {
-                return MAP[maptankx1][maptanky1 - 1] || MAP[maptankx2][maptanky2 - 1];
-            }
-        }
-        if (angle == 180) {
-            if (currentX % 60 == 0) {
-                return MAP[maptankx1][maptanky1 + 1] && (currentY % 60 == 0);
-            } else {
-                return MAP[maptankx1][maptanky1 + 1] || MAP[maptankx2][maptanky2 + 1];
-            }
-        }
-        if (angle == 270) {
-            if (currentY % 60 == 0) {
-                return MAP[maptankx1 - 1][maptanky1] && (currentX % 60 == 0);
-            } else {
-                return MAP[maptankx1 - 1][maptanky1] || MAP[maptankx4 - 1][maptanky4];
-            }
-        }
-        if (angle == 90) {
-            if (currentY % 60 == 0) {
-                return MAP[maptankx1 + 1][maptanky1] && (currentX % 60 == 0);
-            } else {
-                return MAP[maptankx1 + 1][maptanky1] || MAP[maptankx4 + 1][maptanky4];
-            }
-        }
-    }
-    return !((!MAP[maptankx1][maptanky1]) && (!MAP[maptankx2][maptanky2]) && (!MAP[maptankx3][maptanky3]) && (!MAP[maptankx4][maptanky4]));
-}
-
-void EnemyTank::Loadmap(int map[Mapx_size][Mapy_size]) {
-    for (int i = 0; i < Mapx_size; i++) {
-        for (int j = 0; j < Mapy_size; j++) {
-            MAP[i][j] = map[i][j];
-        }
-    }
-}
-
-void EnemyTank::updatemapsit(){
-    maptankx1=currentX/60;
-    maptanky1=currentY/60;
-    maptankx2=(currentX+60)/60;
-    maptanky2=maptanky1;
-    maptankx3=maptankx2;
-    maptanky3=(currentY+60)/60;
-    maptankx4=maptankx1;
-    maptanky4=maptanky3;
+void EnemyTank::updata_enemy_site()
+{
+    playerTank->enemy_tank_x=currentX;
+    playerTank->enemy_tank_y=currentY;
 }

@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include"passWindow.h"
+#include"global.h"
 #include <QMainWindow>
 #include<QPushButton>
 #include<QLabel>
